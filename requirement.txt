@@ -1,0 +1,16 @@
+pandas
+numpy
+requests
+tqdm
+openpyxl
+sodapy
+python-slugify
+rapidfuzz
+geopy
+shapely
+python-dateutil
+matplotlib
+seaborn
+scikit-learn
+jupyter
+os
