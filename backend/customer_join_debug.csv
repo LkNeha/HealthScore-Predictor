@@ -1,0 +1,783 @@
+name_key,BusinessName,address,rating,user_ratings_total,total_violations,total_inspections,fails,fail_rate
+16TH STREET DINER,16th street diner,"3147 16th St, San Francisco, CA 94103, United States",4.7,192.0,3,2,0,0.0
+3RD COUSIN,3rd cousin,"919 Cortland Ave, San Francisco, CA 94110, United States",4.5,394.0,4,6,3,0.5
+707 SUTTER,707 sutter,"707 Sutter St, San Francisco, CA 94109, United States",4.4,848.0,6,8,0,0.0
+A MANO,a mano,"450 Hayes St, San Francisco, CA 94102, United States",4.4,2205.0,8,10,0,0.0
+AAHA INDIAN CUISINE,aaha indian cuisine,"3316 17th St, San Francisco, CA 94110, United States",4.3,419.0,37,11,5,0.45454545454545453
+ABANICO COFFEE ROASTERS,abanico coffee roasters,"2121 Mission St, San Francisco, CA 94110, United States",4.6,246.0,2,3,0,0.0
+ABRAZO,abrazo,"2000 Hyde St, San Francisco, CA 94109, United States",4.6,236.0,0,3,0,0.0
+ABU SALIM MIDDLE EASTERN GRILL,abu salim middle eastern grill,"1599 Haight St, San Francisco, CA 94117, United States",4.4,665.0,20,8,0,0.0
+ABV,abv,"3174 16th St, San Francisco, CA 94103, United States",4.5,1075.0,10,7,0,0.0
+ACAI R,acai r,"1130 Ocean Ave, San Francisco, CA 94112, United States",4.6,223.0,17,4,0,0.0
+ACQUERELLO,acquerello,"NEAR VAN NESS &, 1722 Sacramento St, San Francisco, CA 94109, United States",4.6,624.0,4,9,0,0.0
+ADITI INDIAN CUISINE,aditi indian cuisine,"1101 Valencia St, San Francisco, CA 94110, United States",4.4,309.0,11,12,4,0.3333333333333333
+AJI KIJI,aji kiji,"1552 Fillmore St, San Francisco, CA 94115, United States",4.6,125.0,0,3,0,0.0
+AK SUBS,ak subs,"397 8th St, San Francisco, CA 94103, United States",4.7,367.0,0,4,0,0.0
+AL CARAJO,al carajo,"3224 1/2 22nd St, San Francisco, CA 94110, United States",4.8,365.0,7,5,0,0.0
+AL PASTOR PAPI,al pastor papi,"232 O'Farrell St, San Francisco, CA 94102, United States",4.7,86.0,4,6,0,0.0
+ALIMENTO,alimento,"507 Columbus Ave, San Francisco, CA 94133, United States",4.4,354.0,4,4,0,0.0
+ALTOVINO,altovino,"1358 Mason St, San Francisco, CA 94133, United States",4.6,396.0,2,4,0,0.0
+AMARENA,amarena,"2162 Larkin St, San Francisco, CA 94109, United States",4.8,1393.0,7,2,0,0.0
+AMPLE VITALS,ample vitals,"3201 20th Ave, San Francisco, CA 94132, United States",5.0,5.0,3,3,0,0.0
+ANGIDAY,angiday,"1797 Haight St, San Francisco, CA 94117, United States",4.8,117.0,32,6,0,0.0
+APNA CHULHA,apna chulha,"550 Valencia St, San Francisco, CA 94110, United States",4.6,278.0,17,7,1,0.14285714285714285
+ARABIAN NIGHTS,arabian nights,"2345 Mission St, San Francisco, CA 94110, United States",4.3,592.0,27,9,4,0.4444444444444444
+ARIZMENDI BAKERY,arizmendi bakery,"1268 Valencia St, San Francisco, CA 94110, United States",4.7,1285.0,7,13,0,0.0
+ARIZMENDI BAKERY,arizmendi bakery,"1331 9th Ave, San Francisco, CA 94122, United States",4.7,1913.0,7,13,0,0.0
+ARSICAULT BAKERY,arsicault bakery,"397 Arguello Blvd, San Francisco, CA 94118, United States",4.8,3002.0,17,16,0,0.0
+ARSICAULT BAKERY,arsicault bakery,"87 McAllister St, San Francisco, CA 94102, United States",4.6,979.0,17,16,0,0.0
+AS QUOTED,as quoted,"3613 Sacramento St, San Francisco, CA 94118, United States",4.2,344.0,4,5,0,0.0
+ASIAN BOX,asian box,"2031 Chestnut St, San Francisco, CA 94123, United States",4.4,356.0,12,10,0,0.0
+ASIENTO,asiento,"2730 21st St, San Francisco, CA 94110, United States",4.6,521.0,1,1,0,0.0
+ATELIER CRENN,atelier crenn,"3127 Fillmore St, San Francisco, CA 94123, United States",4.7,729.0,4,4,0,0.0
+ATLAS BITES,atlas bites,"601 Mission Bay Boulevard North, San Francisco, CA 94158, United States",4.8,57.0,1,3,0,0.0
+ATWATER TAVERN,atwater tavern,"295 Terry A Francois Blvd, San Francisco, CA 94158, United States",4.4,1143.0,9,7,0,0.0
+AVOTOASTY,avotoasty,"1796 Union St, San Francisco, CA 94123, United States",4.3,263.0,1,4,0,0.0
+AYOLA,ayola,"118 New Montgomery St, San Francisco, CA 94105, United States",4.2,123.0,11,17,1,0.058823529411764705
+BAAN YAAI,baan yaai,"2274 Lombard St, San Francisco, CA 94123, United States",4.6,261.0,10,6,1,0.16666666666666666
+BACK TO BACK,back to back,"1257 Taylor St, San Francisco, CA 94108, United States",4.6,239.0,17,6,0,0.0
+BACON BACON,bacon bacon,"205A Frederick St, San Francisco, CA 94117, United States",4.3,454.0,4,7,0,0.0
+BALBOA ICE CREAM,balboa ice cream,"1844 San Jose Avenue, San Francisco, CA 94112, United States",4.7,116.0,1,3,0,0.0
+BANDIT,bandit,"632 20th St, San Francisco, CA 94107, United States",4.3,183.0,25,10,1,0.1
+BANH MI CRUNCH,banh mi crunch,"646 Irving St, San Francisco, CA 94122, United States",4.9,326.0,3,3,0,0.0
+BANH MI VIET,banh mi viet,"518 Divisadero St, San Francisco, CA 94117, United States",4.7,230.0,16,7,1,0.14285714285714285
+BANSANG,bansang,"1560 Fillmore St, San Francisco, CA 94115, United States",4.3,339.0,2,1,0,0.0
+BAO,bao,"590 Valencia St, San Francisco, CA 94110, United States",4.5,576.0,24,11,4,0.36363636363636365
+BAR CRUDO,bar crudo,"655 Divisadero St, San Francisco, CA 94117, United States",4.6,784.0,8,8,0,0.0
+BARBERIO OSTERIA,barberio osteria,"557 Valencia St, San Francisco, CA 94110, United States",4.7,134.0,4,1,0,0.0
+BARRIO,barrio,"900 North Point St Unit J 101, San Francisco, CA 94133, United States",4.4,905.0,4,4,0,0.0
+BASIL CANTEEN,basil canteen,"1489 Folsom St, San Francisco, CA 94103, United States",4.4,404.0,7,9,0,0.0
+BAY OF BURMA,bay of burma,"1174 Folsom St Unit B, San Francisco, CA 94103, United States",4.8,179.0,5,3,0,0.0
+BAY POCHA,bay pocha,"2642 Ocean Ave, San Francisco, CA 94132, United States",4.4,340.0,34,5,1,0.2
+BEGONI BISTRO,begoni bistro,"615 Jackson St, San Francisco, CA 94133, United States",4.3,1014.0,22,7,2,0.2857142857142857
+BEIT RIMA,beit rima,"138 Church St, San Francisco, CA 94114, United States",4.4,860.0,29,12,0,0.0
+BEIT RIMA,beit rima,"86 Carl St, San Francisco, CA 94117, United States",4.3,601.0,29,12,0,0.0
+BELLA TRATTORIA,bella trattoria,"3854 Geary Blvd, San Francisco, CA 94118, United States",4.6,1019.0,0,7,0,0.0
+BELLARIA DESSERT STUDIO,bellaria dessert studio,"442 Hyde St, San Francisco, CA 94109, United States",5.0,3.0,2,1,0,0.0
+BENU,benu,"22 Hawthorne St, San Francisco, CA 94105, United States",4.6,719.0,0,2,0,0.0
+BESHARAM,besharam,"1275 Minnesota St, San Francisco, CA 94107, United States",4.0,749.0,2,4,0,0.0
+BETTER THAN SWEET,better than sweet,"1416 Taylor St, San Francisco, CA 94133, United States",4.8,19.0,3,2,0,0.0
+BIG FISH HOUSE,big fish house,"2109 Clement St, San Francisco, CA 94121, United States",4.7,126.0,6,2,1,0.5
+BILLINGSGATE,billingsgate,"3859 24th St, San Francisco, CA 94114, United States",4.7,140.0,2,5,0,0.0
+BIR KITCHEN,bir kitchen,"3111 24th St, San Francisco, CA 94110, United States",4.9,118.0,0,3,0,0.0
+BIRBA,birba,"458 Grove St, San Francisco, CA 94102, United States",4.6,357.0,1,4,0,0.0
+BIRDSONG,birdsong,"1085 Mission St, San Francisco, CA 94103, United States",4.6,448.0,6,4,0,0.0
+BISTRO MEDITERRANEO,bistro mediterraneo,"2955 Clement St, San Francisco, CA 94121, United States",4.8,357.0,2,8,1,0.125
+BITE,bite,"912 Sutter St, San Francisco, CA 94109, United States",4.5,550.0,4,4,0,0.0
+BIX,bix,"56 Gold St, San Francisco, CA 94133, United States",4.5,1253.0,4,4,0,0.0
+BLACKWOOD,blackwood,"2150 Chestnut St, San Francisco, CA 94123, United States",4.4,1388.0,6,3,1,0.3333333333333333
+BLIND BUTCHER,blind butcher,"4058 18th St A, San Francisco, CA 94114, United States",4.3,435.0,10,4,1,0.25
+BLUE BOTTLE COFFEE,blue bottle coffee,"315 Linden St, San Francisco, CA 94102, United States",4.6,873.0,49,59,0,0.0
+BOARD AND DRINK,board and drink,"1329 Columbus Ave, San Francisco, CA 94133, United States",4.8,218.0,3,1,0,0.0
+BOCCONCINO,bocconcino,"516 Green St, San Francisco, CA 94133, United States",4.6,249.0,5,3,0,0.0
+BODEGA SF,bodega sf,"138 Mason St, San Francisco, CA 94102, United States",4.3,647.0,41,10,1,0.1
+BOOCHMANIA,boochmania,"685 Harrison St, San Francisco, CA 94107, United States",5.0,221.0,7,3,0,0.0
+BOOGALOOS,boogaloos,"3296 22nd St, San Francisco, CA 94110, United States",4.3,637.0,8,13,3,0.23076923076923078
+BOTTEGA,bottega,"1132 Valencia St, San Francisco, CA 94110, United States",4.4,990.0,19,13,4,0.3076923076923077
+BOUCHE,bouche,"603 Bush St, San Francisco, CA 94108, United States",4.5,684.0,0,2,0,0.0
+BOUDIN BAKERY,boudin bakery,"399 10th Ave, San Francisco, CA 94118, United States",4.5,486.0,0,25,0,0.0
+BOULEVARD,boulevard,"1 Mission St, San Francisco, CA 94105, United States",4.6,1661.0,0,3,0,0.0
+BRAZUCA GRILL,brazuca grill,"998 Indiana St, San Francisco, CA 94107, United States",4.8,70.0,2,3,0,0.0
+BREADBELLY,breadbelly,"1408 Clement St, San Francisco, CA 94118, United States",4.6,614.0,0,5,0,0.0
+BREAKFAST LITTLE,breakfast little,"3275 22nd St, San Francisco, CA 94110, United States",4.8,663.0,23,6,0,0.0
+BUCKHORN GRILL,buckhorn grill,"135 4th St, San Francisco, CA 94103, United States",4.0,317.0,0,10,2,0.2
+BUENA VIDA CANTINA,buena vida cantina,"860 Folsom St, San Francisco, CA 94107, United States",4.5,356.0,18,12,1,0.08333333333333333
+BURGER KING,burger king,"1690 Valencia St, San Francisco, CA 94110, United States",3.4,789.0,9,5,0,0.0
+BURGER KING,burger king,"1701 Fillmore St, San Francisco, CA 94115, United States",3.2,695.0,9,5,0,0.0
+BURGER KING,burger king,"245 Bayshore Blvd, San Francisco, CA 94124, United States",3.8,1260.0,9,5,0,0.0
+BURGER KING,burger king,"35 Powell St, San Francisco, CA 94102, United States",3.5,1965.0,9,5,0,0.0
+BURGER KING,burger king,"3900 Geary Blvd, San Francisco, CA 94118, United States",3.6,762.0,9,5,0,0.0
+BURGER KING,burger king,"819 Van Ness Ave, San Francisco, CA 94109, United States",3.3,944.0,9,5,0,0.0
+BURGER KING,burger king,"San Francisco International Airport, San Francisco, CA 94128, United States",3.0,264.0,9,5,0,0.0
+BURMA LOVE,burma love,"211 Valencia St, San Francisco, CA 94103, United States",4.5,2188.0,4,8,4,0.5
+BURMESE KITCHEN,burmese kitchen,"between 2nd & 3rd Ave, 3815 Geary Blvd, San Francisco, CA 94118, United States",4.7,377.0,0,7,2,0.2857142857142857
+BURSA,bursa,"60 W Portal Ave, San Francisco, CA 94127, United States",4.5,674.0,4,5,0,0.0
+CAFE BUNN MI,cafe bunn mi,"417 Clement St, San Francisco, CA 94118, United States",4.3,618.0,3,9,0,0.0
+CAFE DE CASA,cafe de casa,"3985 17th St, San Francisco, CA 94114, United States",4.6,694.0,10,12,0,0.0
+CAFE DE CASA,cafe de casa,"685 Beach St, San Francisco, CA 94133, United States",4.7,1703.0,10,12,0,0.0
+CAFE DU SOLEIL,cafe du soleil,"345 3rd St, San Francisco, CA 94107, United States",4.8,216.0,3,5,0,0.0
+CAFE FRANCISCO,cafe francisco,"2161 Powell St, San Francisco, CA 94133, United States",4.5,536.0,4,3,0,0.0
+CAFE INTERNATIONAL,cafe international,"508 Haight St, San Francisco, CA 94117, United States",4.5,516.0,4,7,2,0.2857142857142857
+CAFE JACQUELINE,cafe jacqueline,"1454 Grant Ave, San Francisco, CA 94133, United States",4.4,198.0,3,2,0,0.0
+CAFFE CENTRAL,caffe central,"133 O'Farrell St, San Francisco, CA 94102, United States",4.5,1395.0,4,10,2,0.2
+CAFFE GRECO,caffe greco,"423 Columbus Ave, San Francisco, CA 94133, United States",4.4,1508.0,5,5,0,0.0
+CAFFE TRIESTE,caffe trieste,"601 Vallejo St, San Francisco, CA 94133, United States",4.4,1694.0,8,5,0,0.0
+CAKE COQUETTE,cake coquette,"1501 Cortland Ave, San Francisco, CA 94110, United States",4.6,37.0,0,6,0,0.0
+CALIBUR INC,calibur inc,"68 W Portal Ave, San Francisco, CA 94127, United States",4.4,537.0,0,2,0,0.0
+CALIFORNIOS,californios,"355 11th St, San Francisco, CA 94103, United States",4.7,512.0,2,5,0,0.0
+CAMINO ALTO,camino alto,"1715 Union St, San Francisco, CA 94123, United States",4.6,400.0,0,2,0,0.0
+CANTINA LOS MAYAS,cantina los mayas,"431 Balboa St, San Francisco, CA 94118, United States",4.8,233.0,0,2,0,0.0
+CANTOO LATIN ASIAN ROTISSERIE,cantoo latin asian rotisserie,"572 O'Farrell St, San Francisco, CA 94102, United States",4.7,469.0,26,9,1,0.1111111111111111
+CAPITAL,capital,"839 Clay St, San Francisco, CA 94108, United States",4.3,888.0,24,9,0,0.0
+CAUSWELLS,causwells,"2346 Chestnut St, San Francisco, CA 94123, United States",4.3,920.0,5,4,0,0.0
+CHA CHA CHA,cha cha cha,"1801 Haight St, San Francisco, CA 94117, United States",4.4,2072.0,33,17,3,0.17647058823529413
+CHAA ROEN POHN,chaa roen pohn,"1241 Vicente St, San Francisco, CA 94116, United States",4.8,74.0,5,3,0,0.0
+CHAAT CORNER,chaat corner,"320 3rd St, San Francisco, CA 94107, United States",3.8,2071.0,29,13,1,0.07692307692307693
+CHAO PESCAO,chao pescao,"272 McAllister St, San Francisco, CA 94102, United States",4.3,460.0,6,7,0,0.0
+CHAPEAU,chapeau,"126 Clement St, San Francisco, CA 94118, United States",4.7,750.0,0,1,0,0.0
+CHE FICO,che fico,"838 Divisadero St, San Francisco, CA 94117, United States",4.2,1114.0,3,6,0,0.0
+CHENNAI KINGS,chennai kings,"418 Beach St, San Francisco, CA 94133, United States",3.8,1093.0,28,7,3,0.42857142857142855
+CHERRY BLOSSOM BAKERY,cherry blossom bakery,"844 Clement St, San Francisco, CA 94118, United States",4.3,146.0,0,6,0,0.0
+CHEZ MAMAN WEST,chez maman west,"401 Gough St, San Francisco, CA 94102, United States",4.5,1895.0,6,3,0,0.0
+CHINA LIVE,china live,"644 Broadway, San Francisco, CA 94133, United States",4.2,2886.0,30,17,2,0.11764705882352941
+CHINATOWN RESTAURANT,chinatown restaurant,"744 Washington St 1st Floor, San Francisco, CA 94108, United States",3.9,1526.0,10,1,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"121 4th St, San Francisco, CA 94103, United States",3.4,989.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"1523 Sloat Blvd, San Francisco, CA 94132, United States",3.7,326.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"211 Sutter St, San Francisco, CA 94104, United States",3.7,1068.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"2675 Geary Blvd, San Francisco, CA 94118, United States",2.7,927.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"3251 20th Ave Space OP183, San Francisco, CA 94132, United States",3.7,982.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"400 Howard St, San Francisco, CA 94105, United States",3.6,384.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"50 California St, San Francisco, CA 94111, United States",3.6,575.0,0,8,0,0.0
+CHIPOTLE MEXICAN GRILL,chipotle mexican grill,"525 Market St, San Francisco, CA 94105, United States",3.8,479.0,0,8,0,0.0
+CHOCOLATE COVERED,chocolate covered,"4069 24th St #4071, San Francisco, CA 94114, United States",4.9,258.0,5,2,0,0.0
+CHOME,chome,"3601 26th St, San Francisco, CA 94110, United States",4.4,355.0,0,7,3,0.42857142857142855
+CHOUX,choux,"248 Fillmore St, San Francisco, CA 94117, United States",4.5,189.0,0,3,0,0.0
+CHRISTOPHER ELBOW CHOCOLATES,christopher elbow chocolates,"401 Hayes St, San Francisco, CA 94102, United States",4.6,291.0,0,5,0,0.0
+CITY SMOKE HOUSE,city smoke house,"1000 Van Ness Ave Suite 10003-A, San Francisco, CA 94109, United States",4.7,52.0,0,3,0,0.0
+CITYSCAPE,cityscape,"333 O'Farrell St, San Francisco, CA 94102, United States",4.5,1965.0,2,2,0,0.0
+CLEMENT BBQ,clement bbq,"617 Clement St, San Francisco, CA 94118, United States",4.1,77.0,11,11,1,0.09090909090909091
+COCOBANG,cocobang,"550 Taylor St, San Francisco, CA 94102, United States",4.6,558.0,43,13,3,0.23076923076923078
+COFFEESHOP,coffeeshop,"3139 Mission St, San Francisco, CA 94110, United States",4.6,277.0,6,8,1,0.125
+COLLINA,collina,"1550 Hyde St, San Francisco, CA 94109, United States",4.8,143.0,9,2,0,0.0
+COLUMBUS BURGERS,columbus burgers,"57 Columbus Ave, San Francisco, CA 94111, United States",4.5,251.0,5,5,0,0.0
+COMMON SAGE,common sage,"1552 Polk St, San Francisco, CA 94109, United States",4.4,235.0,8,6,1,0.16666666666666666
+COOL BAR,cool bar,"1380 Sutter St, San Francisco, CA 94109, United States",4.6,32.0,5,3,0,0.0
+COPRA,copra,"1700 Fillmore St, San Francisco, CA 94115, United States",4.3,939.0,3,2,0,0.0
+COQUETA,coqueta,"Pier 5 The Embarcadero, San Francisco, CA 94111, United States",4.4,2741.0,11,10,2,0.2
+COTOGNA,cotogna,"490 Pacific Ave, San Francisco, CA 94133, United States",4.5,2080.0,0,8,0,0.0
+CRAFTSMAN AND WOLVES VALENCIA,craftsman and wolves valencia,"746 Valencia St, San Francisco, CA 94110, United States",4.5,1031.0,11,2,0,0.0
+CUPPA,cuppa,"2810 Diamond St, San Francisco, CA 94131, United States",4.3,142.0,4,5,0,0.0
+CURRY LEAF,curry leaf,"943 Columbus Ave, San Francisco, CA 94133, United States",4.2,1421.0,10,2,0,0.0
+CURRY UP NOW,curry up now,"659 Valencia St, San Francisco, CA 94110, United States",4.3,1195.0,10,12,1,0.08333333333333333
+DA BOOT TO DA BAY,da boot to da bay,"1379 4th St, San Francisco, CA 94158, United States",5.0,6.0,4,4,0,0.0
+DA FLORA,da flora,"701 Columbus Ave, San Francisco, CA 94133, United States",4.7,191.0,2,5,0,0.0
+DANDELION CHOCOLATE,dandelion chocolate,"1 Ferry Building Shop 14, San Francisco, CA 94111, United States",4.5,171.0,14,7,0,0.0
+DANDELION CHOCOLATE,dandelion chocolate,"740 Valencia St, San Francisco, CA 94110, United States",4.7,2648.0,14,7,0,0.0
+DAY MOON,day moon,"3928 Irving St, San Francisco, CA 94122, United States",4.7,131.0,3,4,0,0.0
+DAYDREAM CAKE SHOP,daydream cake shop,"1788 32nd Ave, San Francisco, CA 94122, United States",4.4,69.0,2,2,0,0.0
+DECCAN HOUSE,deccan house,"1142 Valencia St, San Francisco, CA 94110, United States",4.0,528.0,9,10,2,0.2
+DEL POPOLO,del popolo,"855 Bush St, San Francisco, CA 94108, United States",4.4,1306.0,2,6,0,0.0
+DELAH COFFEE,delah coffee,"370 4th St, San Francisco, CA 94107, United States",4.7,1030.0,0,5,0,0.0
+DELAH COFFEE,delah coffee,"450 Sansome St, San Francisco, CA 94111, United States",4.6,247.0,0,5,0,0.0
+DELI BOARD,deli board,"1058 Folsom St, San Francisco, CA 94103, United States",4.6,1308.0,0,5,0,0.0
+DELI SHACK,deli shack,"452 Larkin St, San Francisco, CA 94102, United States",4.9,39.0,6,3,0,0.0
+DELICIOUS DIM SUM,delicious dim sum,"752 Jackson St, San Francisco, CA 94133, United States",4.4,523.0,0,8,3,0.375
+DELIGHTS BY LISA,delights by lisa,"1767 Church St, San Francisco, CA 94131, United States",5.0,19.0,0,1,0,0.0
+DETROIT SQUARE PIZZA,detroit square pizza,"3107 16th St, San Francisco, CA 94103, United States",4.4,109.0,4,3,0,0.0
+DIM SUM BISTRO,dim sum bistro,"675 Broadway, San Francisco, CA 94133, United States",4.2,580.0,0,4,0,0.0
+DIRTY HABIT,dirty habit,"12 4th St, San Francisco, CA 94103, United States",4.2,645.0,0,2,0,0.0
+DIWALI INDIAN CUISINE,diwali indian cuisine,"1499 Valencia St, San Francisco, CA 94110, United States",4.8,256.0,4,3,0,0.0
+DOMO,domo,"511 Laguna St, San Francisco, CA 94102, United States",4.4,582.0,3,4,0,0.0
+DONAJI,donaji,"3161 24th St, San Francisco, CA 94110, United States",4.7,283.0,11,4,0,0.0
+DONUT WORLD,donut world,"1399 9th Ave, San Francisco, CA 94122, United States",4.5,296.0,2,8,0,0.0
+DOUGH,dough,"1455 Market St UNIT 3C, San Francisco, CA 94103, United States",4.5,70.0,7,3,0,0.0
+DRAGON BEAUX,dragon beaux,"5700 Geary Blvd, San Francisco, CA 94121, United States",4.4,2006.0,17,14,1,0.07142857142857142
+DRAGON WELL,dragon well,"2142 Chestnut St, San Francisco, CA 94123, United States",4.2,329.0,4,7,0,0.0
+DRAGONEATS,dragoneats,"1671 Haight St, San Francisco, CA 94117, United States",4.6,410.0,34,24,2,0.08333333333333333
+DRAGONEATS,dragoneats,"520 Gough St, San Francisco, CA 94102, United States",4.7,450.0,34,24,2,0.08333333333333333
+DUBOCE PARK CAFE,duboce park cafe,"2 Sanchez St, San Francisco, CA 94114, United States",4.3,990.0,2,1,0,0.0
+DUMPLING HOME,dumpling home,"298 Gough St, San Francisco, CA 94102, United States",4.6,1491.0,6,6,0,0.0
+DUMPLING HOUSE,dumpling house,"335 Noe St, San Francisco, CA 94114, United States",4.5,529.0,0,4,0,0.0
+DUMPLING KITCHEN,dumpling kitchen,"1935 Taraval St, San Francisco, CA 94116, United States",4.4,1078.0,22,11,5,0.45454545454545453
+DUMPLING SPECIALIST,dumpling specialist,"1119-1123 Taraval St, San Francisco, CA 94116, United States",4.7,189.0,3,6,0,0.0
+DUMPLING ZONE,dumpling zone,"408 Dewey Blvd, San Francisco, CA 94116, United States",4.8,212.0,10,3,1,0.3333333333333333
+EARTHBAR,earthbar,"2055-A Union St, San Francisco, CA 94123, United States",3.6,61.0,0,5,0,0.0
+EARTHBAR,earthbar,"2234 Chestnut St, San Francisco, CA 94123, United States",4.1,125.0,0,5,0,0.0
+EARTHBAR,earthbar,"Inside Equinox, 1560 Mission St, San Francisco, CA 94103, United States",3.7,19.0,0,5,0,0.0
+EARTHBAR,earthbar,"Inside Equinox, 301 Pine St, San Francisco, CA 94104, United States",3.0,10.0,0,5,0,0.0
+EARTHBAR,earthbar,"Inside Equinox, 747 Market St, San Francisco, CA 94103, United States",3.1,38.0,0,5,0,0.0
+EASY BREEZY FROZEN YOGURT,easy breezy frozen yogurt,"4028 24th St, San Francisco, CA 94114, United States",4.6,255.0,9,15,0,0.0
+EASY BREEZY FROZEN YOGURT,easy breezy frozen yogurt,"44 W Portal Ave, San Francisco, CA 94127, United States",4.3,120.0,9,15,0,0.0
+EASY BREEZY FROZEN YOGURT,easy breezy frozen yogurt,"718 Irving St, San Francisco, CA 94122, United States",4.4,175.0,9,15,0,0.0
+EL BUEN COMER,el buen comer,"3435 Mission St, San Francisco, CA 94110, United States",4.6,625.0,0,4,2,0.5
+EL CAFETAZO,el cafetazo,"3087 16th St, San Francisco, CA 94103, United States",4.0,136.0,16,7,2,0.2857142857142857
+EL CHATO,el chato,"2301 Bryant St, San Francisco, CA 94110, United States",4.7,148.0,4,2,1,0.5
+EL LOPO,el lopo,"1327 Polk St, San Francisco, CA 94109, United States",4.7,333.0,0,3,0,0.0
+EL MANSOUR,el mansour,"3119 Clement St, San Francisco, CA 94121, United States",4.5,389.0,3,3,0,0.0
+EL MIL AMORES,el mil amores,"2780 21st St, San Francisco, CA 94110, United States",4.8,450.0,17,3,2,0.6666666666666666
+EL POLLO SUPREMO,el pollo supremo,"5210 Mission St, San Francisco, CA 94112, United States",4.2,1312.0,0,4,0,0.0
+EL TONAYENSE,el tonayense,"1719 Harrison St, San Francisco, CA 94103, United States",4.0,193.0,1,1,0,0.0
+ELIXIRIA,elixiria,"25 Beale St, San Francisco, CA 94105, United States",4.6,80.0,0,1,0,0.0
+EMBER GRILL,ember grill,"670 Larkin St, San Francisco, CA 94109, United States",4.5,63.0,4,3,0,0.0
+EMPRESS BY BOON,empress by boon,"838 Grant Ave, San Francisco, CA 94108, United States",4.2,488.0,7,3,0,0.0
+ENJOY VEGETARIAN,enjoy vegetarian,"839 Kearny St, San Francisco, CA 94108, United States",4.3,817.0,0,2,0,0.0
+FABLE,fable,"558 Castro St, San Francisco, CA 94114, United States",4.4,1046.0,11,5,1,0.2
+FALAFEL CITY,falafel city,"425 Ellis St, San Francisco, CA 94102, United States",4.7,170.0,14,7,1,0.14285714285714285
+FALASTEEN,falasteen,"4018 24th St, San Francisco, CA 94114, United States",5.0,2.0,1,1,0,0.0
+FANG,fang,"660 Howard St, San Francisco, CA 94105, United States",4.1,1636.0,6,2,0,0.0
+FARMHOUSE KITCHEN THAI CUISINE,farmhouse kitchen thai cuisine,"1549 Shattuck Ave., Berkeley, CA 94709, United States",4.8,2325.0,1,4,0,0.0
+FARMHOUSE KITCHEN THAI CUISINE,farmhouse kitchen thai cuisine,"710 Florida St, San Francisco, CA 94110, United States",4.4,2996.0,1,4,0,0.0
+FILLMORE BAKESHOP,fillmore bakeshop,"1890 Fillmore St, San Francisco, CA 94115, United States",4.6,358.0,4,1,0,0.0
+FINO,fino,"624 Post St, San Francisco, CA 94109, United States",4.6,1028.0,0,2,0,0.0
+FIORELLA SUNSET,fiorella sunset,"1240 9th Ave, San Francisco, CA 94122, United States",4.5,438.0,1,5,0,0.0
+FIRENZE BY NIGHT,firenze by night,"1429 Stockton St, San Francisco, CA 94133, United States",4.6,654.0,13,9,0,0.0
+FISHMANDU SUSHI,fishmandu sushi,"846 Geary St, San Francisco, CA 94109, United States",4.8,490.0,4,5,0,0.0
+FIVE GUYS,five guys,"2278 Westborough Blvd, South San Francisco, CA 94080, United States",4.4,809.0,0,1,0,0.0
+FIVE GUYS,five guys,"90 Charter Oak Ave, San Francisco, CA 94124, United States",3.4,23.0,0,1,0,0.0
+FIVE STAR TRUFFLES,five star truffles,"4251-A 18th St, San Francisco, CA 94114, United States",4.6,70.0,1,2,0,0.0
+FLORECITA PANADERIA,florecita panaderia,"2050 Bryant St, San Francisco, CA 94110, United States",4.9,66.0,0,1,0,0.0
+FLYING NINJA,flying ninja,"461 Jefferson St, San Francisco, CA 94109, United States",4.4,682.0,3,4,0,0.0
+FLYWHEEL COFFEE ROASTERS,flywheel coffee roasters,"672 Stanyan St, San Francisco, CA 94117, United States",4.5,1265.0,6,8,0,0.0
+FOG HARBOR FISH HOUSE,fog harbor fish house,"39 Pier, San Francisco, CA 94133, United States",4.5,9730.0,7,9,0,0.0
+FOOD BASKET MARKET,food basket market,"475 Fell St, San Francisco, CA 94102, United States",4.8,66.0,0,1,0,0.0
+FOREIGN CINEMA,foreign cinema,"2534 Mission St, San Francisco, CA 94110, United States",4.5,3244.0,0,7,0,0.0
+FOUR BARREL COFFEE,four barrel coffee,"375 Valencia St, San Francisco, CA 94103, United States",4.5,2613.0,0,3,0,0.0
+FOUR CHAIRS,four chairs,"3282 Mission St, San Francisco, CA 94110, United States",4.4,355.0,12,6,0,0.0
+FRASCATI,frascati,"1901 Hyde St, San Francisco, CA 94109, United States",4.7,410.0,2,2,0,0.0
+FREEKEH,freekeh,"3126 16th St, San Francisco, CA 94103, United States",4.7,323.0,1,3,0,0.0
+FRESH BREW COFFEE,fresh brew coffee,"882 Bush St, San Francisco, CA 94108, United States",4.8,774.0,1,3,0,0.0
+FUNG WONG SF,fung wong sf,"2500 Noriega St, San Francisco, CA 94122, United States",3.7,191.0,23,10,4,0.4
+GALINETTE,galinette,"3554-3560 Taraval St, San Francisco, CA 94116, United States",4.6,173.0,0,2,0,0.0
+GARAJE,garaje,"475 3rd St, San Francisco, CA 94107, United States",4.6,2191.0,7,5,0,0.0
+GARDEN CREAMERY,garden creamery,"3566 20th St, San Francisco, CA 94110, United States",4.7,1286.0,2,2,0,0.0
+GARY DANKO,gary danko,"800 North Point St, San Francisco, CA 94109, United States",4.6,2072.0,2,2,0,0.0
+GIALINA,gialina,"2842 Diamond St, San Francisco, CA 94131, United States",4.6,468.0,0,2,0,0.0
+GLAZE DONUTS,glaze donuts,"4499 Mission St, San Francisco, CA 94112, United States",4.3,173.0,14,5,0,0.0
+GOLDEN BOY PIZZA,golden boy pizza,"542 Green St, San Francisco, CA 94133, United States",4.7,4729.0,10,12,0,0.0
+GOLDEN EDGE PIZZA,golden edge pizza,"5351 Geary Blvd, San Francisco, CA 94121, United States",4.6,253.0,0,3,0,0.0
+GOLDEN GATE DONUTS,golden gate donuts,"4201 Telegraph Ave, Oakland, CA 94609, United States",4.6,315.0,0,1,0,0.0
+GOLDEN GATE DONUTS,golden gate donuts,"6 6th St, San Francisco, CA 94103, United States",4.7,70.0,0,1,0,0.0
+GOLDEN LOTUS,golden lotus,"1301 Franklin St, Oakland, CA 94612, United States",4.5,821.0,0,4,0,0.0
+GOOD LUCK DIM SUM,good luck dim sum,"736 Clement St, San Francisco, CA 94118, United States",4.4,892.0,4,8,0,0.0
+GRAND COFFEE,grand coffee,"2663 Mission St, San Francisco, CA 94110, United States",4.6,198.0,9,6,0,0.0
+GUSTO PINSA ROMANA,gusto pinsa romana,"1000 Bush St, San Francisco, CA 94109, United States",4.7,798.0,5,6,0,0.0
+GYRO KING,gyro king,"25 Grove St #4702, San Francisco, CA 94102, United States",4.4,873.0,9,7,0,0.0
+HABIBI MARKET,habibi market,"26 6th St, San Francisco, CA 94103, United States",4.4,130.0,0,1,0,0.0
+HAHDOUGH,hahdough,"1221 Fell St, San Francisco, CA 94117, United States",4.6,180.0,1,9,0,0.0
+HAI KY MI GIA,hai ky mi gia,"707 Ellis St, San Francisco, CA 94109, United States",4.5,651.0,0,2,0,0.0
+HALAL FRIED CHICKEN,halal fried chicken,"601 Geary St, San Francisco, CA 94102, United States",3.7,130.0,24,8,0,0.0
+HALAL SHOP,halal shop,"Alcove C Cesar Chavez Center, 1650 Holloway Ave, San Francisco, CA 94132, United States",4.8,27.0,12,4,0,0.0
+HALAL WINGS PLUS,halal wings plus,"533 Jones St, San Francisco, CA 94102, United States",4.3,1309.0,26,15,0,0.0
+HAMBURGER PROJECT,hamburger project,"808 Divisadero St, San Francisco, CA 94117, United States",3.8,308.0,2,1,0,0.0
+HAN IL KWAN,han il kwan,"1802 Balboa St, San Francisco, CA 94121, United States",4.4,1460.0,8,6,1,0.16666666666666666
+HANG AH TEA ROOM,hang ah tea room,"1 Pagoda Pl, San Francisco, CA 94108, United States",3.9,606.0,9,6,1,0.16666666666666666
+HAPPY DONUTS,happy donuts,"2600 Bayshore Blvd #2602, San Francisco, CA 94134, United States",4.4,245.0,13,25,2,0.08
+HAPPY DONUTS,happy donuts,"299 Ellis St, San Francisco, CA 94102, United States",4.6,139.0,13,25,2,0.08
+HAPPY DONUTS,happy donuts,"3801 24th St, San Francisco, CA 94114, United States",4.4,608.0,13,25,2,0.08
+HAPPY KING PIZZA,happy king pizza,"227 King St, San Francisco, CA 94107, United States",4.6,476.0,42,8,3,0.375
+HAPPY YOGURT,happy yogurt,"503 33rd Ave, San Francisco, CA 94121, United States",4.2,45.0,5,7,0,0.0
+HARAZ COFFEE HOUSE,haraz coffee house,"1452 Franklin St, San Francisco, CA 94109, United States",4.6,536.0,5,1,0,0.0
+HEALTHYISH REPUBLIC,healthyish republic,"2990 24th St, San Francisco, CA 94110, United States",4.5,263.0,26,8,2,0.25
+HED 11,hed 11,"1800 Sutter St, San Francisco, CA 94115, United States",4.5,80.0,20,7,0,0.0
+HEDGE COFFEE,hedge coffee,"434 Shotwell St, San Francisco, CA 94110, United States",4.7,156.0,0,1,0,0.0
+HI HAT,hi hat,"1432 Valencia St, San Francisco, CA 94110, United States",5.0,86.0,0,2,0,0.0
+HILDA AND JESSE,hilda and jesse,"701 Union St, San Francisco, CA 94133, United States",3.9,495.0,3,3,0,0.0
+HILLSTONE,hillstone,"1800 Montgomery St, San Francisco, CA 94111, United States",4.4,2132.0,4,5,0,0.0
+HING LUNG COMPANY,hing lung company,"927 Post St, San Francisco, CA 94109, United States",4.6,180.0,0,1,0,0.0
+HINODEYA RAMEN UNION SQUARE,hinodeya ramen union square,"219 O'Farrell St, San Francisco, CA 94102, United States",4.6,1777.0,25,10,0,0.0
+HIPPIE THAI STREET FOOD,hippie thai street food,"1418 Haight St, San Francisco, CA 94117, United States",4.1,514.0,5,7,0,0.0
+HK LOUNGE BISTRO,hk lounge bistro,"1136 Folsom St, San Francisco, CA 94103, United States",4.6,293.0,4,2,0,0.0
+HOME PLATE,home plate,"2150 Lombard St, San Francisco, CA 94123, United States",4.3,1361.0,15,6,2,0.3333333333333333
+HONG KONG LOUNGE,hong kong lounge,"5322 Geary Blvd, San Francisco, CA 94121, United States",4.2,1596.0,31,17,10,0.5882352941176471
+HOT COOKIE,hot cookie,"407 Castro St, San Francisco, CA 94114, United States",4.5,116.0,5,8,0,0.0
+HOUSE OF BAGELS,house of bagels,"5030 Geary Blvd, San Francisco, CA 94118, United States",4.2,447.0,4,7,0,0.0
+HOUSE OF DIM SUM,house of dim sum,"735 Jackson St, San Francisco, CA 94133, United States",3.5,1071.0,33,10,1,0.1
+HOUSE OF NANKING,house of nanking,"919 Kearny St, San Francisco, CA 94133, United States",4.2,4906.0,0,5,0,0.0
+HOUSE OF PRIME RIB,house of prime rib,"1906 Van Ness Ave, San Francisco, CA 94109, United States",4.7,6968.0,7,8,1,0.125
+HOUSE OF THAI,house of thai,"901 Larkin St, San Francisco, CA 94109, United States",4.4,809.0,11,8,0,0.0
+HUMMUS BODEGA,hummus bodega,"5549 Geary Blvd, San Francisco, CA 94121, United States",4.6,533.0,4,12,0,0.0
+HUMPHRY SLOCOMBE,humphry slocombe,"One Ferry Building #8, San Francisco, CA 94111, United States",4.4,884.0,0,4,0,0.0
+ICICLES,icicles,"829 Mission St, San Francisco, CA 94103, United States",4.4,313.0,0,4,1,0.25
+IKON COFFEE,ikon coffee,"1302 22nd St, San Francisco, CA 94107, United States",4.8,152.0,2,4,1,0.25
+IL CASARO PIZZERIA,il casaro pizzeria,"348 Columbus Ave, San Francisco, CA 94133, United States",4.6,2370.0,9,5,1,0.2
+ILCHA,ilcha,"2151 Lombard St, San Francisco, CA 94123, United States",4.3,276.0,0,1,0,0.0
+ITRIA,itria,"3266 24th St, San Francisco, CA 94110, United States",4.4,314.0,8,4,0,0.0
+IZAKAYA MAYUMI,izakaya mayumi,"2221 Clement St, San Francisco, CA 94121, United States",4.8,133.0,1,5,0,0.0
+IZAKAYA SOZAI,izakaya sozai,"1500 Irving St, San Francisco, CA 94122, United States",4.3,620.0,0,3,0,0.0
+JALEBI STREET,jalebi street,"1466 Haight St, San Francisco, CA 94117, United States",4.6,411.0,2,1,0,0.0
+JANE THE BAKERY,jane the bakery,"1881 Geary Blvd, San Francisco, CA 94115, United States",4.6,1280.0,6,5,0,0.0
+JAPANESE HOUSE,japanese house,"510 Mission St, San Francisco, CA 94105, United States",4.5,105.0,8,2,0,0.0
+JASMINE GARDEN,jasmine garden,"708 14th St, San Francisco, CA 94114, United States",4.5,377.0,0,2,0,0.0
+JAVA BEACH CAFE,java beach cafe,"1396 La Playa St, San Francisco, CA 94122, United States",4.4,1617.0,2,1,0,0.0
+JIJIME,jijime,"5524 Geary Blvd, San Francisco, CA 94121, United States",4.5,366.0,1,3,0,0.0
+JIKASEI MENSHO,jikasei mensho,"1355 Market St #120, San Francisco, CA 94103, United States",4.1,71.0,0,8,2,0.25
+JINA BAKES,jina bakes,"1581 Webster St #150, San Francisco, CA 94115, United States",4.5,284.0,16,9,0,0.0
+JJAMPPONG,jjamppong,"5249 Mission St, San Francisco, CA 94112, United States",4.7,274.0,2,3,0,0.0
+JOHNNY DOUGHNUTS,johnny doughnuts,"1617 4th St, San Rafael, CA 94901, United States",4.5,486.0,8,6,0,0.0
+JOHNNY DOUGHNUTS,johnny doughnuts,"2404 California St, San Francisco, CA 94115, United States",4.4,498.0,8,6,0,0.0
+JOINT VENTURE KITCHEN,joint venture kitchen,"167 11th St, San Francisco, CA 94103, United States",4.2,13.0,2,1,0,0.0
+JOLLIBEE,jollibee,"6955 Mission St Suite 101, Daly City, CA 94014, United States",4.2,2164.0,4,1,0,0.0
+JUDAHLICIOUS,judahlicious,"3906 Judah St, San Francisco, CA 94122, United States",4.5,665.0,0,2,0,0.0
+JUICE PORTAL,juice portal,"166 W Portal Ave, San Francisco, CA 94127, United States",4.4,32.0,3,5,0,0.0
+JUICE SHOP,juice shop,"432 Octavia Street at, Hayes St, San Francisco, CA 94102, United States",4.4,71.0,0,3,0,0.0
+JULES,jules,"237 Fillmore St, San Francisco, CA 94117, United States",4.5,141.0,3,3,0,0.0
+JUNIPER,juniper,"1401 Polk St, San Francisco, CA 94109, United States",4.7,466.0,9,8,0,0.0
+KAHNFECTIONS,kahnfections,"3321 20th St, San Francisco, CA 94110, United States",4.7,368.0,14,7,1,0.14285714285714285
+KAM PO KITCHEN,kam po kitchen,"801 Broadway, San Francisco, CA 94133, United States",4.0,605.0,17,12,0,0.0
+KANTINE,kantine,"1906 Market St, San Francisco, CA 94102, United States",4.6,903.0,2,6,0,0.0
+KARAHI HOUSE,karahi house,"1409 Polk St, San Francisco, CA 94109, United States",4.5,183.0,6,3,0,0.0
+KASA INDIAN EATERY,kasa indian eatery,"4001 18th St, San Francisco, CA 94114, United States",4.1,668.0,4,18,2,0.1111111111111111
+KC PARIS DESSERTS,kc paris desserts,"1365 Fillmore St, San Francisco, CA 94115, United States",4.9,77.0,5,7,0,0.0
+KEEVA INDIAN KITCHEN,keeva indian kitchen,"908 Clement St, San Francisco, CA 94118, United States",4.4,577.0,0,5,0,0.0
+KEN,ken,"252 Divisadero St, San Francisco, CA 94117, United States",5.0,130.0,5,4,0,0.0
+KFC,kfc,"1111 El Camino Real, South San Francisco, CA 94080, United States",3.6,213.0,0,3,0,0.0
+KFC,kfc,"1150 Taraval St, San Francisco, CA 94116, United States",3.8,301.0,0,3,0,0.0
+KFC,kfc,"4150 Geary Blvd, San Francisco, CA 94118, United States",3.5,282.0,0,3,0,0.0
+KFC,kfc,"4285 Mission St, San Francisco, CA 94112, United States",3.9,431.0,0,3,0,0.0
+KFC,kfc,"691 Eddy St, San Francisco, CA 94109, United States",3.1,490.0,0,3,0,0.0
+KHAO TIEW,khao tiew,"272 Claremont Blvd, San Francisco, CA 94127, United States",4.6,210.0,9,4,0,0.0
+KILN,kiln,"149 Fell St, San Francisco, CA 94102, United States",4.8,133.0,1,1,0,0.0
+KING OF THAI NOODLE HOUSE,king of thai noodle house,"184 O'Farrell St, San Francisco, CA 94102, United States",4.0,1488.0,13,21,0,0.0
+KINGBOB,kingbob,"645 Clay St, San Francisco, CA 94111, United States",4.7,309.0,4,7,1,0.14285714285714285
+KINGDOM OF DUMPLING,kingdom of dumpling,"1713 Taraval St, San Francisco, CA 94116, United States",4.4,269.0,5,11,1,0.09090909090909091
+KISS MY SEOUL,kiss my seoul,"15 Boardman Pl, San Francisco, CA 94103, United States",4.7,144.0,21,9,2,0.2222222222222222
+KITAVA,kitava,"2011 Mission St, San Francisco, CA 94110, United States",4.5,636.0,4,6,0,0.0
+KITCHEN ISTANBUL,kitchen istanbul,"349 Clement St, San Francisco, CA 94118, United States",4.5,432.0,5,1,0,0.0
+KITCHEN STORY,kitchen story,"3499 16th St, San Francisco, CA 94114, United States",4.4,2680.0,8,8,0,0.0
+KOJA KITCHEN,koja kitchen,"309 6th Ave, San Francisco, CA 94118, United States",4.4,529.0,0,3,0,0.0
+KOKAK CHOCOLATES,kokak chocolates,"3901 18th St, San Francisco, CA 94114, United States",4.9,59.0,1,2,0,0.0
+KOKKARI ESTIATORIO,kokkari estiatorio,"200 Jackson St, San Francisco, CA 94111, United States",4.7,3350.0,14,6,1,0.16666666666666666
+KOLAPASI SOUTH INDIAN CUISINE,kolapasi south indian cuisine,"3465 19th St, San Francisco, CA 94110, United States",4.7,263.0,9,5,0,0.0
+KOTHAI REPUBLIC,kothai republic,"1398 9th Ave, San Francisco, CA 94122, United States",4.8,334.0,0,4,0,0.0
+KUI SHIN BO,kui shin bo,"1424 Lombard St, San Francisco, CA 94123, United States",4.4,516.0,7,2,1,0.5
+KUI SHIN BO,kui shin bo,"22 Peace Plaza #2, 22 Peace Plz, San Francisco, CA 94115, United States",4.4,832.0,7,2,1,0.5
+KUMA ON VALENCIA,kuma on valencia,"198 Valencia St, San Francisco, CA 94103, United States",4.6,184.0,7,4,0,0.0
+KUNG FOOD,kung food,"1615 McAllister St #4413, San Francisco, CA 94115, United States",4.5,619.0,0,7,2,0.2857142857142857
+KUSAKABE,kusakabe,"584 Washington St, San Francisco, CA 94111, United States",4.7,752.0,3,7,0,0.0
+KUSHI TSURU,kushi tsuru,"1737 Post St #380, San Francisco, CA 94115, United States",4.3,1073.0,5,7,1,0.14285714285714285
+LA BOULANGERIE DE SAN FRANCISCO,la boulangerie de san francisco,"2325 Pine St, San Francisco, CA 94115, United States",4.4,459.0,27,21,1,0.047619047619047616
+LA BOULANGERIE DE SAN FRANCISCO,la boulangerie de san francisco,"500 Hayes St, San Francisco, CA 94102, United States",4.2,979.0,27,21,1,0.047619047619047616
+LA CICCIA,la ciccia,"291 30th St, San Francisco, CA 94131, United States",4.7,716.0,8,2,0,0.0
+LA CIGALE,la cigale,"679 Chenery St, San Francisco, CA 94131, United States",4.4,24.0,14,4,0,0.0
+LA LUNA CUPCAKES,la luna cupcakes,"Level 1, Store #10, 50 Post St #10, San Francisco, CA 94104, United States",4.6,94.0,2,6,0,0.0
+LA MEDITERRANEE,la mediterranee,"2210 Fillmore St, San Francisco, CA 94115, United States",4.5,945.0,7,8,0,0.0
+LA MEDITERRANEE,la mediterranee,"288 Noe St, San Francisco, CA 94114, United States",4.4,575.0,7,8,0,0.0
+LA MEJOR BAKERY,la mejor bakery,"3329 24th St, San Francisco, CA 94110, United States",4.6,191.0,0,5,1,0.2
+LA TAQUERIA,la taqueria,"2889 Mission St, San Francisco, CA 94110, United States",4.5,6880.0,6,6,0,0.0
+LA TRAVESIA,la travesia,"1022 Bush St, San Francisco, CA 94109, United States",4.8,117.0,1,3,0,0.0
+LA TRAVIATA,la traviata,"2854 Mission St, San Francisco, CA 94110, United States",4.6,402.0,5,4,0,0.0
+LA VACA BIRRIA,la vaca birria,"2962 24th St, San Francisco, CA 94110, United States",4.4,356.0,19,9,1,0.1111111111111111
+LALE,lale,"731 Irving St, San Francisco, CA 94122, United States",4.4,568.0,2,6,1,0.16666666666666666
+LAO TABLE,lao table,"149 2nd St, San Francisco, CA 94105, United States",4.2,1392.0,0,12,3,0.25
+LAPISARA EATERY,lapisara eatery,"698 Post St, San Francisco, CA 94109, United States",4.7,1831.0,14,8,0,0.0
+LAS MESTIZAS,las mestizas,"2280 Chestnut St, San Francisco, CA 94123, United States",4.5,156.0,19,4,2,0.5
+LAST DROP TAVERN,last drop tavern,"550 Powell St, San Francisco, CA 94108, United States",4.4,1089.0,4,4,0,0.0
+LAVASH,lavash,"511 Irving St, San Francisco, CA 94122, United States",4.3,1088.0,12,5,0,0.0
+LAZY BEAR,lazy bear,"3416 19th St, San Francisco, CA 94110, United States",4.8,1124.0,20,8,0,0.0
+LE CAFE DU SOLEIL,le cafe du soleil,"400 Waller St, San Francisco, CA 94117, United States",4.5,671.0,3,3,1,0.3333333333333333
+LE MARAIS BAKERY,le marais bakery,"1138 Sutter St, San Francisco, CA 94109, United States",4.4,330.0,9,4,0,0.0
+LE MARAIS BAKERY,le marais bakery,"498 Sanchez St, San Francisco, CA 94114, United States",4.3,1054.0,9,4,0,0.0
+LE PARC BISTROBAR,le parc bistrobar,"185 Sutter St, San Francisco, CA 94104, United States",4.9,447.0,6,2,1,0.5
+LE SANDWICH,le sandwich,"752 Columbus Ave, San Francisco, CA 94133, United States",4.9,233.0,4,6,0,0.0
+LIGURIA BAKERY,liguria bakery,"1700 Stockton St, San Francisco, CA 94133, United States",4.8,432.0,4,5,0,0.0
+LIHOLIHO YACHT CLUB,liholiho yacht club,"871 Sutter St, San Francisco, CA 94109, United States",4.7,1857.0,3,4,0,0.0
+LIMONCELLO,limoncello,"1400 Sutter St, San Francisco, CA 94109, United States",4.8,1131.0,16,13,1,0.07692307692307693
+LITTLE CAESARS PIZZA,little caesars pizza,"1200 Market St, San Francisco, CA 94102, United States",3.2,26.0,0,4,0,0.0
+LITTLE CAESARS PIZZA,little caesars pizza,"90 Charter Oak Ave, San Francisco, CA 94124, United States",3.6,47.0,0,4,0,0.0
+LITTLE CAESARS PIZZA,little caesars pizza,"955 Geneva Ave, San Francisco, CA 94112, United States",4.2,863.0,0,4,0,0.0
+LITTLE DELHI,little delhi,"83 Eddy St, San Francisco, CA 94102, United States",4.1,1125.0,6,4,0,0.0
+LITTLE SHUCKER,little shucker,"2016 Fillmore St, San Francisco, CA 94115, United States",4.4,217.0,2,2,0,0.0
+LITTLE SWEET,little sweet,"3836 Geary Blvd, San Francisco, CA 94118, United States",4.4,417.0,32,23,3,0.13043478260869565
+LOCALI MEDITERRANEAN,locali mediterranean,"98 Battery St Ste B, San Francisco, CA 94111, United States",4.5,112.0,4,5,0,0.0
+LOKMA,lokma,"1801 Clement St, San Francisco, CA 94121, United States",4.6,1382.0,9,13,0,0.0
+LOLINDA,lolinda,"2518 Mission St, San Francisco, CA 94110, United States",4.6,1736.0,4,9,1,0.1111111111111111
+LONG BRIDGE PIZZA COMPANY,long bridge pizza company,"2347 3rd St, San Francisco, CA 94107, United States",4.6,1139.0,1,5,0,0.0
+LOQUAT,loquat,"198 Gough St, San Francisco, CA 94102, United States",4.7,334.0,5,3,0,0.0
+LOVING CUP,loving cup,"608 Divisadero St, San Francisco, CA 94117, United States",4.2,136.0,9,5,0,0.0
+LUCCA DELICATESSEN,lucca delicatessen,"2120 Chestnut St, San Francisco, CA 94123, United States",4.5,442.0,2,6,0,0.0
+LUSH GELATO,lush gelato,"520 Columbus Ave, San Francisco, CA 94133, United States",4.7,681.0,3,6,0,0.0
+MAGICAL DONUTS,magical donuts,"1379 4th St, San Francisco, CA 94158, United States",4.9,80.0,0,3,0,0.0
+MAGICAL ICE CREAM,magical ice cream,"900 Grant Ave, San Francisco, CA 94108, United States",4.2,307.0,7,7,0,0.0
+MAISON NICO,maison nico,"710 Montgomery St, San Francisco, CA 94111, United States",4.5,587.0,3,9,0,0.0
+MAMAHUHU,mamahuhu,"517 Clement St, San Francisco, CA 94118, United States",4.4,525.0,4,14,2,0.14285714285714285
+MAMANOKO,mamanoko,"2317 Chestnut St, San Francisco, CA 94123, United States",4.5,464.0,2,5,0,0.0
+MAMO,mamo,"3659 Buchanan St, San Francisco, CA 94123, United States",4.4,193.0,1,2,0,0.0
+MANNA,manna,"845 Irving St, San Francisco, CA 94122, United States",4.5,921.0,1,5,1,0.2
+MARCO POLO ITALIAN ICE CREAM,marco polo italian ice cream,"3886 Noriega St, San Francisco, CA 94122, United States",4.7,678.0,0,4,0,0.0
+MARINA INDIAN CUISINE,marina indian cuisine,"1968 Lombard St, San Francisco, CA 94123, United States",4.8,357.0,1,2,0,0.0
+MARIPOSA BAKING COMPANY,mariposa baking company,"One Ferry Building #32, San Francisco, CA 94111, United States",4.5,372.0,1,1,0,0.0
+MARLOWE,marlowe,"500 Brannan St, San Francisco, CA 94107, United States",4.3,1892.0,10,3,0,0.0
+MARU SUSHI,maru sushi,"529 Powell St, San Francisco, CA 94108, United States",4.1,1104.0,9,6,0,0.0
+MARUFUKU RAMEN,marufuku ramen,"1581 Webster St #235, San Francisco, CA 94115, United States",4.5,2866.0,4,7,1,0.14285714285714285
+MARUFUKU RAMEN,marufuku ramen,"4828 Telegraph Ave, Oakland, CA 94609, United States",4.6,1394.0,4,7,1,0.14285714285714285
+MATADOR,matador,"679 Sutter St, San Francisco, CA 94102, United States",4.3,1374.0,8,7,0,0.0
+MATCHA CAFE MAIKO,matcha cafe maiko,"1581 Webster St # 175, San Francisco, CA 94115, United States",4.7,749.0,4,11,0,0.0
+MATCHING HALF,matching half,"1799 McAllister St, San Francisco, CA 94115, United States",4.4,477.0,3,5,0,0.0
+MATKO,matko,"736 Valencia St, San Francisco, CA 94110, United States",4.6,113.0,5,8,0,0.0
+MAYKADEH,maykadeh,"470 Green St, San Francisco, CA 94133, United States",3.9,1050.0,11,5,1,0.2
+MEDITERRANEAN AROMA,mediterranean aroma,"900 16th St, San Francisco, CA 94107, United States",4.5,361.0,4,6,0,0.0
+MERCHANT ROOTS,merchant roots,"1148 Mission St, San Francisco, CA 94103, United States",4.6,167.0,0,5,0,0.0
+METROPOLITAN COFFEE,metropolitan coffee,"720 Market St, San Francisco, CA 94102, United States",4.6,120.0,1,3,0,0.0
+MEZZE AND MOOORE,mezze and mooore,"198 Guerrero St, San Francisco, CA 94103, United States",4.7,479.0,0,2,1,0.5
+MEZZE AND MOOORE II,mezze and mooore ii,"627 Irving St, San Francisco, CA 94122, United States",4.8,77.0,3,6,0,0.0
+MILKBOMB ICE CREAM,milkbomb ice cream,"1717 17th St, San Francisco, CA 94103, United States",4.7,407.0,0,3,1,0.3333333333333333
+MILOS MEZE,milos meze,"3348 Steiner St, San Francisco, CA 94123, United States",4.9,311.0,2,1,0,0.0
+MISS SAIGON,miss saigon,"100 6th St, San Francisco, CA 94103, United States",4.2,926.0,0,3,0,0.0
+MISSION CURRY HOUSE,mission curry house,"2434 Mission St, San Francisco, CA 94110, United States",4.4,322.0,37,12,4,0.3333333333333333
+MISSION MINIS,mission minis,"3168 22nd St, San Francisco, CA 94110, United States",4.3,113.0,6,4,1,0.25
+MISSION ROCK RESORT,mission rock resort,"817 Terry A Francois Blvd, San Francisco, CA 94158, United States",4.4,2108.0,14,10,2,0.2
+MIXTO LATIN CUISINE,mixto latin cuisine,"3914 Judah St, San Francisco, CA 94122, United States",4.6,164.0,4,4,0,0.0
+MOLINARI DELICATESSEN,molinari delicatessen,"373 Columbus Ave, San Francisco, CA 94133, United States",4.7,1351.0,11,7,1,0.14285714285714285
+MOMO NOODLE,momo noodle,"601 Mission Bay Boulevard North, San Francisco, CA 94158, United States",4.1,26.0,3,16,0,0.0
+MONGKOK DIM SUM,mongkok dim sum,"2438 Noriega St, San Francisco, CA 94122, United States",3.8,205.0,5,7,3,0.42857142857142855
+MONTESACRO MARINA,montesacro marina,"3317 Steiner St, San Francisco, CA 94123, United States",4.4,143.0,8,3,2,0.6666666666666666
+MORA TACO TRUCK,mora taco truck,"601 Mission Bay Boulevard North, San Francisco, CA 94158, United States",4.2,24.0,0,2,0,0.0
+MOYA,moya,"121 9th St, San Francisco, CA 94103, United States",4.6,345.0,0,1,0,0.0
+MUSE JUICE BAR,muse juice bar,"2056 Polk St, San Francisco, CA 94109, United States",4.9,200.0,7,6,0,0.0
+MUSE JUICE BAR,muse juice bar,"2220 Chestnut St, San Francisco, CA 94123, United States",5.0,46.0,7,6,0,0.0
+MUUKATA6395,muukata6395,"4217 Geary Blvd, San Francisco, CA 94118, United States",4.6,202.0,2,1,0,0.0
+MY TOFU HOUSE,my tofu house,"4627 Geary Blvd, San Francisco, CA 94118, United States",4.5,502.0,0,5,0,0.0
+MYMY,mymy,"1500 California St, San Francisco, CA 94109, United States",4.5,1936.0,18,5,2,0.4
+NAKAMA SUSHI,nakama sushi,"41 Franklin St, San Francisco, CA 94102, United States",4.7,306.0,9,6,0,0.0
+NARA,nara,"1515 Polk St, San Francisco, CA 94109, United States",4.4,560.0,0,2,0,0.0
+NARA,nara,"518 Haight St, San Francisco, CA 94117, United States",4.5,634.0,0,2,0,0.0
+NARI,nari,"1625 Post St, San Francisco, CA 94115, United States",4.3,522.0,6,5,0,0.0
+NATIVE BURGER,native burger,"3420 Geary Blvd, San Francisco, CA 94118, United States",4.6,318.0,6,5,0,0.0
+NEIGHBOR BAKEHOUSE,neighbor bakehouse,"2343 3rd St UNIT 100, San Francisco, CA 94107, United States",4.7,1131.0,0,1,0,0.0
+NEPA INDIAN CUISINE,nepa indian cuisine,"507 Divisadero St, San Francisco, CA 94117, United States",4.8,941.0,20,4,0,0.0
+NEW THAI ELEPHANT,new thai elephant,"393 Bay St, San Francisco, CA 94133, United States",4.7,1947.0,40,15,7,0.4666666666666667
+NIGHTBIRD,nightbird,"330 Gough St, San Francisco, CA 94102, United States",4.6,246.0,4,5,0,0.0
+NIKU STEAKHOUSE,niku steakhouse,"61 Division St, San Francisco, CA 94103, United States",4.5,776.0,5,6,0,0.0
+NOE INDIAN CUISINE,noe indian cuisine,"4166 24th St, San Francisco, CA 94114, United States",4.8,459.0,37,8,3,0.375
+NOE VALLEY BAKERY,noe valley bakery,"4073 24th St, San Francisco, CA 94114, United States",4.6,778.0,16,7,0,0.0
+NOODLE IN A HAYSTACK,noodle in a haystack,"4601 Geary Blvd, San Francisco, CA 94118, United States",4.7,59.0,4,2,0,0.0
+NOPA,nopa,"560 Divisadero St, San Francisco, CA 94117, United States",4.5,2953.0,4,2,0,0.0
+NOPALITO,nopalito,"306 Broderick St, San Francisco, CA 94117, United States",4.3,1985.0,3,3,0,0.0
+NORCINA,norcina,"3251 Pierce St, San Francisco, CA 94123, United States",4.4,280.0,2,3,0,0.0
+NORTH BEACH CANTINA,north beach cantina,"1548 Stockton St, San Francisco, CA 94133, United States",4.6,213.0,14,6,0,0.0
+NORTH BEACH GYROS,north beach gyros,"561 Columbus Ave, San Francisco, CA 94133, United States",4.9,3317.0,11,7,1,0.14285714285714285
+NORTH INDIA,north india,"123 2nd St, San Francisco, CA 94105, United States",4.2,3156.0,3,9,1,0.1111111111111111
+NORTHERN CHINA BBQ,northern china bbq,"294 9th St, San Francisco, CA 94103, United States",4.7,214.0,7,4,0,0.0
+OASIS GRILL,oasis grill,"711 Market St B, San Francisco, CA 94103, United States",4.2,825.0,17,17,0,0.0
+OASIS GRILL,oasis grill,"91 Drumm St, San Francisco, CA 94111, United States",4.5,697.0,17,17,0,0.0
+OCEAN INDIAN CUISINE,ocean indian cuisine,"6127 Geary Blvd, San Francisco, CA 94121, United States",4.5,602.0,16,6,0,0.0
+OCEAN SUBS,ocean subs,"18 Ocean Ave, San Francisco, CA 94112, United States",5.0,63.0,0,2,0,0.0
+OCTAVIA,octavia,"1701 Octavia St, San Francisco, CA 94109, United States",4.6,770.0,8,8,0,0.0
+OFENA,ofena,"2529 Ocean Ave, San Francisco, CA 94132, United States",4.6,116.0,47,4,1,0.25
+OKAERI JAPANESE BISTRO,okaeri japanese bistro,"3515 20th St, San Francisco, CA 94110, United States",4.5,268.0,46,10,1,0.1
+OKOZE SUSHI,okoze sushi,"1207 Union St, San Francisco, CA 94109, United States",4.6,324.0,2,2,0,0.0
+OLD JERUSALEM RESTAURANT,old jerusalem restaurant,"2966 Mission St, San Francisco, CA 94110, United States",4.5,1215.0,19,9,1,0.1111111111111111
+OLLEI,ollei,"2127 Polk St, San Francisco, CA 94109, United States",4.5,159.0,5,4,0,0.0
+OM INDIAN CUISINE,om indian cuisine,"1668 Haight St, San Francisco, CA 94117, United States",4.6,952.0,12,8,0,0.0
+OM SABOR,om sabor,"370 Grove St, San Francisco, CA 94102, United States",4.5,219.0,2,2,0,0.0
+OMA SAN FRANCISCO STATION,oma san francisco station,"1737 Post St #337, San Francisco, CA 94115, United States",4.5,218.0,8,4,0,0.0
+OMAKASE,omakase,"665 Townsend St, San Francisco, CA 94103, United States",4.6,440.0,0,1,0,0.0
+ONCE UPON A DOSA,once upon a dosa,"35 Kearny St, San Francisco, CA 94108, United States",4.4,194.0,3,2,0,0.0
+ONO HAWAIIAN BBQ,ono hawaiian bbq,"1501 Sloat Blvd Suite A, San Francisco, CA 94132, United States",4.1,460.0,30,10,3,0.3
+ORAAN THAI EATERY,oraan thai eatery,"3750 Geary Blvd, San Francisco, CA 94118, United States",4.7,152.0,3,1,0,0.0
+OSMANTHUS DIM SUM LOUNGE,osmanthus dim sum lounge,"504 Broadway, San Francisco, CA 94133, United States",4.4,502.0,13,11,5,0.45454545454545453
+OTRA,otra,"682 Haight St, San Francisco, CA 94117, United States",4.5,375.0,7,4,0,0.0
+OUTERLANDS,outerlands,"4001 Judah St, San Francisco, CA 94122, United States",4.4,1668.0,8,5,0,0.0
+PACIFIC CATCH,pacific catch,"1200 9th Ave, San Francisco, CA 94122, United States",4.3,2091.0,22,16,1,0.0625
+PACIFIC CATCH,pacific catch,"2027 Chestnut St, San Francisco, CA 94123, United States",4.5,1079.0,22,16,1,0.0625
+PALETTE TEA HOUSE,palette tea house,"900 North Point St, San Francisco, CA 94109, United States",4.4,1494.0,8,7,0,0.0
+PALMYRA,palmyra,"700 Haight St, San Francisco, CA 94117, United States",4.6,757.0,5,4,0,0.0
+PANDA EXPRESS,panda express,"1224 Fairmont Dr Suite 102, San Leandro, CA 94578, United States",3.9,7.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"1480 Fillmore St, San Francisco, CA 94115, United States",3.6,777.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"3251 20th Ave #250h, San Francisco, CA 94132, United States",3.8,277.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"3519 California St, San Francisco, CA 94118, United States",4.1,74.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"3801 3rd St #300, San Francisco, CA 94124, United States",4.0,68.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"500 Parnassus Ave, San Francisco, CA 94143, United States",3.8,297.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"701 Westlake Center, Daly City, CA 94015, United States",4.0,848.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"865 Market St C-24, San Francisco, CA 94103, United States",4.1,700.0,1,15,1,0.06666666666666667
+PANDA EXPRESS,panda express,"San Francisco Airport, International Terminal A, International Terminal Departures Level, San Francisco, CA 94128, United States",4.4,12.0,1,15,1,0.06666666666666667
+PAPITO,papito,"1457 18th St, San Francisco, CA 94107, United States",4.6,825.0,9,6,1,0.16666666666666666
+PARADA 22,parada 22,"1805 Haight St, San Francisco, CA 94117, United States",4.5,1279.0,18,7,0,0.0
+PARIS 75,paris 75,"515 Broadway, San Francisco, CA 94133, United States",4.7,157.0,3,3,0,0.0
+PARIS BAGUETTE,paris baguette,"550 Market St, San Francisco, CA 94104, United States",4.5,346.0,32,7,1,0.14285714285714285
+PASTA PANINO,pasta panino,"4150 18th St, San Francisco, CA 94114, United States",4.5,202.0,5,3,1,0.3333333333333333
+PASTA SUPPLY CO,pasta supply co,"236 Clement St, San Francisco, CA 94118, United States",4.6,385.0,5,5,0,0.0
+PEACHES PATTIES,peaches patties,"2948 Folsom St, San Francisco, CA 94110, United States",4.3,19.0,28,14,0,0.0
+PEACHES PATTIES,peaches patties,"Ferry Building, San Francisco, CA 94105, United States",4.4,146.0,28,14,0,0.0
+PEACOCK PANSY,peacock pansy,"392 Fulton St, San Francisco, CA 94102, United States",4.5,269.0,6,2,0,0.0
+PERBACCO,perbacco,"230 California St, San Francisco, CA 94111, United States",4.5,995.0,12,11,1,0.09090909090909091
+PERILLA,perilla,"836 Irving St, San Francisco, CA 94122, United States",4.5,667.0,10,7,1,0.14285714285714285
+PHAT THAI,phat thai,"2380 Lombard St, San Francisco, CA 94123, United States",4.6,290.0,9,6,0,0.0
+PHILMORE CREAMERY,philmore creamery,"1840 Fillmore St, San Francisco, CA 94115, United States",4.8,585.0,2,1,0,0.0
+PHILZ COFFEE TRUCK,philz coffee truck,"500 Marina Blvd, San Francisco, CA 94123, United States",4.3,47.0,1,5,0,0.0
+PHO 2000,pho 2000,"637 Larkin St, San Francisco, CA 94109, United States",4.7,492.0,4,6,0,0.0
+PHO 808,pho 808,"808 Geary St, San Francisco, CA 94109, United States",4.6,61.0,43,9,1,0.1111111111111111
+PHO GOLDEN,pho golden,"4683 Mission St, San Francisco, CA 94112, United States",4.9,44.0,2,2,0,0.0
+PHO HUONG VIET,pho huong viet,"5733 Geary Blvd, San Francisco, CA 94121, United States",4.5,324.0,6,7,2,0.2857142857142857
+PHO STAR,pho star,"3214 16th St, San Francisco, CA 94103, United States",4.8,73.0,11,5,1,0.2
+PIAZZA PELLEGRINI,piazza pellegrini,"659 Columbus Ave, San Francisco, CA 94133, United States",4.4,1174.0,15,3,1,0.3333333333333333
+PICARO,picaro,"3120 16th St, San Francisco, CA 94103, United States",4.5,1558.0,2,2,0,0.0
+PICCINO,piccino,"1001 Minnesota St, San Francisco, CA 94107, United States",4.5,1319.0,6,7,0,0.0
+PICCOLO FORNO,piccolo forno,"725 Columbus Ave, San Francisco, CA 94133, United States",4.7,2013.0,4,7,0,0.0
+PIE PUNKS,pie punks,"145 2nd St, San Francisco, CA 94105, United States",4.7,594.0,0,5,1,0.2
+PINECREST DINER,pinecrest diner,"401 Geary St, San Francisco, CA 94102, United States",4.3,4553.0,22,13,0,0.0
+PINHOLE COFFEE,pinhole coffee,"231 Cortland Ave, San Francisco, CA 94110, United States",4.6,599.0,0,4,0,0.0
+PINK ONION,pink onion,"64 14th St, San Francisco, CA 94103, United States",4.4,786.0,25,8,1,0.125
+PIZZERIA DELFINA,pizzeria delfina,"2406 California St, San Francisco, CA 94115, United States",4.4,923.0,2,5,0,0.0
+PIZZETTA 211,pizzetta 211,"211 23rd Ave, San Francisco, CA 94121, United States",4.6,1019.0,1,9,0,0.0
+PLAIN JANE,plain jane,"1000 Guerrero St, San Francisco, CA 94110, United States",4.4,389.0,9,8,3,0.375
+PLOW,plow,"1299 18th St, San Francisco, CA 94107, United States",4.4,2760.0,2,5,0,0.0
+POESIA,poesia,"4072 18th St, San Francisco, CA 94114, United States",4.5,593.0,6,7,0,0.0
+POLLO CAMPERO,pollo campero,"2740 Mission St, San Francisco, CA 94110, United States",4.3,3536.0,9,17,1,0.058823529411764705
+POLLY ANN ICE CREAM,polly ann ice cream,"3138 Noriega St, San Francisco, CA 94122, United States",4.6,761.0,2,6,0,0.0
+POWDER,powder,"260 Divisadero St, San Francisco, CA 94117, United States",4.5,434.0,3,4,0,0.0
+PRESSED JUICERY,pressed juicery,"2162A Union St, San Francisco, CA 94123, United States",4.5,44.0,3,9,0,0.0
+PRESSED JUICERY,pressed juicery,"3901 24th St, San Francisco, CA 94114, United States",4.3,72.0,3,9,0,0.0
+PRESSED JUICERY,pressed juicery,"75 1st St, San Francisco, CA 94105, United States",4.1,93.0,3,9,0,0.0
+PRIK HOM,prik hom,"3226 Geary Blvd, San Francisco, CA 94118, United States",4.4,148.0,4,3,0,0.0
+PROGRESSIVE GROUNDS,progressive grounds,"400 Cortland Ave, San Francisco, CA 94110, United States",4.5,459.0,6,4,0,0.0
+PROPOSITION CHICKEN,proposition chicken,"3465 California St, San Francisco, CA 94118, United States",4.3,908.0,16,8,0,0.0
+PROSPECT,prospect,"300 Spear St, San Francisco, CA 94105, United States",4.4,992.0,4,4,1,0.25
+PUERTO ALEGRE,puerto alegre,"546 Valencia St, San Francisco, CA 94110, United States",4.5,805.0,0,3,0,0.0
+QUINCE,quince,"470 Pacific Ave, San Francisco, CA 94133, United States",4.6,739.0,3,7,0,0.0
+RAD RADISH,rad radish,"301 Hayes St, San Francisco, CA 94102, United States",4.5,548.0,12,10,1,0.1
+RAMEN HOUSE,ramen house,"2623 San Bruno Ave, San Francisco, CA 94134, United States",4.2,149.0,5,6,0,0.0
+RAMENWELL,ramenwell,"3378 18th St, San Francisco, CA 94110, United States",4.5,664.0,12,8,1,0.125
+RAW SUGAR FACTORY,raw sugar factory,"530 Valencia St, San Francisco, CA 94110, United States",4.2,427.0,9,5,1,0.2
+RED WINDOW,red window,"500 Columbus Ave, San Francisco, CA 94133, United States",4.4,423.0,0,1,0,0.0
+REGALITO EL MIL AMORES,regalito el mil amores,"3481 18th St, San Francisco, CA 94110, United States",4.8,56.0,8,7,1,0.14285714285714285
+RICCO MEDITERRANEAN,ricco mediterranean,"3145 Fillmore St, San Francisco, CA 94123, United States",4.7,132.0,11,3,0,0.0
+RICH TABLE,rich table,"199 Gough St, San Francisco, CA 94102, United States",4.7,1494.0,0,4,1,0.25
+RINTARO,rintaro,"82 14th St, San Francisco, CA 94103, United States",4.5,1300.0,9,6,0,0.0
+RITUAL COFFEE ROASTERS,ritual coffee roasters,"1026 Valencia St, San Francisco, CA 94110, United States",4.3,1680.0,9,8,0,0.0
+RITUAL COFFEE ROASTERS,ritual coffee roasters,"432 Octavia St B, San Francisco, CA 94102, United States",4.5,540.0,9,8,0,0.0
+ROAM ARTISAN BURGERS,roam artisan burgers,"1785 Union St, San Francisco, CA 94123, United States",4.4,1387.0,7,9,0,0.0
+ROAM ARTISAN BURGERS,roam artisan burgers,"1923 Fillmore St, San Francisco, CA 94115, United States",4.4,1799.0,7,9,0,0.0
+ROAMING GOAT,roaming goat,"1830 Union St, San Francisco, CA 94123, United States",4.6,165.0,0,5,0,0.0
+ROBIN,robin,"620 Gough St, San Francisco, CA 94102, United States",4.6,570.0,1,2,0,0.0
+ROMA ANTICA,roma antica,"3242 Scott St, San Francisco, CA 94123, United States",4.5,1635.0,2,5,1,0.2
+ROSE INDIAN CUISINE,rose indian cuisine,"1330 9th Ave, San Francisco, CA 94122, United States",4.5,809.0,25,20,2,0.1
+ROTI INDIAN BISTRO,roti indian bistro,"53 W Portal Ave, San Francisco, CA 94127, United States",4.4,567.0,7,6,1,0.16666666666666666
+ROUTIER,routier,"2801 California St, San Francisco, CA 94115, United States",4.6,282.0,1,3,0,0.0
+ROXIE FOOD CENTER,roxie food center,"1901 San Jose Avenue, San Francisco, CA 94112, United States",4.7,739.0,0,2,0,0.0
+RT ROTISSERIE,rt rotisserie,"101 Oak St, San Francisco, CA 94102, United States",4.5,957.0,10,17,0,0.0
+RURAL RAMEN BAR,rural ramen bar,"1059 Powell St, San Francisco, CA 94108, United States",4.5,392.0,4,5,0,0.0
+RUSTY LADLE,rusty ladle,"3645 Lawton St, San Francisco, CA 94122, United States",4.7,86.0,1,5,0,0.0
+SABABA,sababa,"329 Kearny St, San Francisco, CA 94108, United States",4.2,458.0,3,7,0,0.0
+SABROSA PIZZA,sabrosa pizza,"4124 Geary Blvd, San Francisco, CA 94118, United States",4.6,192.0,2,4,0,0.0
+SAI JAI THAI,sai jai thai,"771 O'Farrell St, San Francisco, CA 94109, United States",4.2,417.0,7,2,0,0.0
+SAIGON BBQ NOODLE HOUSE,saigon bbq noodle house,"1936 Irving St, San Francisco, CA 94122, United States",4.7,236.0,3,4,1,0.25
+SAINT FRANK COFFEE,saint frank coffee,"2340 Polk St, San Francisco, CA 94109, United States",4.5,1310.0,3,7,0,0.0
+SAISON,saison,"178 Townsend St, San Francisco, CA 94107, United States",4.6,619.0,0,4,0,0.0
+SAIWAII RAMEN,saiwaii ramen,"2240 Irving St, San Francisco, CA 94122, United States",4.4,585.0,4,4,0,0.0
+SAN HO WON,san ho won,"2170 Bryant St, San Francisco, CA 94110, United States",4.6,650.0,0,1,0,0.0
+SAN TUNG,san tung,"1031 Irving St, San Francisco, CA 94122, United States",4.4,2469.0,2,2,0,0.0
+SCULLERY,scullery,"687 Geary St, San Francisco, CA 94102, United States",4.7,530.0,4,4,0,0.0
+SEAFOOD STATION,seafood station,"803 Cortland Ave, San Francisco, CA 94110, United States",4.6,240.0,0,2,0,0.0
+SEARS FINE FOOD,sears fine food,"439 Powell St, San Francisco, CA 94102, United States",4.3,3875.0,0,5,0,0.0
+SENS,sens,"4 Embarcadero Ctr Level, San Francisco, CA 94111, United States",4.3,950.0,16,5,2,0.4
+SEOUL GARDEN,seoul garden,"1655 Post St, San Francisco, CA 94115, United States",4.0,260.0,8,5,1,0.2
+SEVEN HILLS,seven hills,"1896 Hyde St, San Francisco, CA 94109, United States",4.7,859.0,1,2,0,0.0
+SEXTANT COFFEE ROASTERS,sextant coffee roasters,"1415 Folsom St, San Francisco, CA 94103, United States",4.4,717.0,13,14,0,0.0
+SEXTANT COFFEE ROASTERS,sextant coffee roasters,"539 Valencia St, San Francisco, CA 94110, United States",4.1,58.0,13,14,0,0.0
+SF ORGANICA,sf organica,"500 Larkin St, San Francisco, CA 94102, United States",4.8,121.0,7,3,0,0.0
+SHAWS SAN FRANCISCO,shaws san francisco,"122 W Portal Ave, San Francisco, CA 94127, United States",4.7,90.0,2,5,0,0.0
+SHIZEN,shizen,"370 14th St, San Francisco, CA 94103, United States",4.7,3101.0,0,2,0,0.0
+SHOKUDOU,shokudou,"1000 Cortland Ave, San Francisco, CA 94110, United States",4.5,142.0,6,2,0,0.0
+SHUFAT MARKET,shufat market,"3807 24th St, San Francisco, CA 94114, United States",4.6,31.0,13,4,0,0.0
+SICHUAN HOME,sichuan home,"5037 Geary Blvd, San Francisco, CA 94118, United States",4.3,409.0,3,8,0,0.0
+SIDEWALK JUICE,sidewalk juice,"3100 24th St, San Francisco, CA 94110, United States",4.4,134.0,26,20,1,0.05
+SIDEWALK JUICE,sidewalk juice,"3287 21st St, San Francisco, CA 94110, United States",4.4,181.0,26,20,1,0.05
+SIDEWALK JUICE,sidewalk juice,"Gate F12, Domestic Terminals Departures Level Concourse F, San Francisco, CA 94128, United States",3.4,94.0,26,20,1,0.05
+SIGHTGLASS COFFEE,sightglass coffee,"270 7th St, San Francisco, CA 94103, United States",4.4,3269.0,7,7,2,0.2857142857142857
+SISTERITA,sisterita,"669 Commercial St, San Francisco, CA 94111, United States",4.6,628.0,5,2,0,0.0
+SMISH SMASH,smish smash,"945 Market St First Floor, San Francisco, CA 94103, United States",4.3,22.0,18,2,0,0.0
+SMITTEN ICE CREAM,smitten ice cream,"904 Valencia St, San Francisco, CA 94110, United States",4.5,838.0,5,8,0,0.0
+SNOWBIRD COFFEE,snowbird coffee,"1352 9th Ave A, San Francisco, CA 94122, United States",4.5,515.0,2,5,0,0.0
+SOCOLA CHOCOLATIER,socola chocolatier,"535 Folsom St, San Francisco, CA 94105, United States",4.7,120.0,0,2,0,0.0
+SOMISOMI,somisomi,"1350 4th St, San Francisco, CA 94158, United States",4.4,134.0,4,6,0,0.0
+SORELLA,sorella,"1760 Polk St, San Francisco, CA 94109, United States",4.4,274.0,13,3,1,0.3333333333333333
+SORREL,sorrel,"3228 Sacramento St, San Francisco, CA 94115, United States",4.5,499.0,4,3,0,0.0
+SOULEY VEGAN,souley vegan,"101 Broadway, Oakland, CA 94607, United States",4.5,1903.0,0,6,1,0.16666666666666666
+SOUVLA,souvla,"2272 Chestnut St, San Francisco, CA 94123, United States",4.5,451.0,23,29,0,0.0
+SOUVLA,souvla,"2505 3rd St, San Francisco, CA 94107, United States",4.3,181.0,23,29,0,0.0
+SOUVLA,souvla,"517 Hayes St, San Francisco, CA 94102, United States",4.5,2270.0,23,29,0,0.0
+SOUVLA,souvla,"531 Divisadero St, San Francisco, CA 94117, United States",4.5,1230.0,23,29,0,0.0
+SOUVLA,souvla,"758 Valencia St, San Francisco, CA 94110, United States",4.5,1205.0,23,29,0,0.0
+SPARK SOCIAL SF,spark social sf,"601 Mission Bay Boulevard North, San Francisco, CA 94158, United States",4.6,3879.0,0,3,0,0.0
+SPQR,spqr,"1911 Fillmore St, San Francisco, CA 94115, United States",4.3,772.0,0,3,0,0.0
+SPRUCE,spruce,"3640 Sacramento St, San Francisco, CA 94118, United States",4.6,1695.0,9,6,0,0.0
+SQUARE PIE GUYS,square pie guys,"845 Beach St, San Francisco, CA 94109, United States",4.5,604.0,4,11,1,0.09090909090909091
+SRI THAI CUISINE,sri thai cuisine,"4621 Lincoln Way, San Francisco, CA 94122, United States",4.7,667.0,5,5,0,0.0
+SRIRACHA THAI CUISINE,sriracha thai cuisine,"1319 9th Ave, San Francisco, CA 94122, United States",4.8,1252.0,4,8,1,0.125
+SSAL,ssal,"2226 Polk St, San Francisco, CA 94109, United States",4.7,211.0,1,2,0,0.0
+STAR INDIA,star india,"3721 Geary Blvd, San Francisco, CA 94118, United States",4.2,824.0,0,9,0,0.0
+STATE BIRD PROVISIONS,state bird provisions,"1529 Fillmore St, San Francisco, CA 94115, United States",4.5,2325.0,1,4,0,0.0
+STELLA PASTRY,stella pastry,"446 Columbus Ave, San Francisco, CA 94133, United States",4.5,1340.0,6,5,0,0.0
+STONE KOREAN KITCHEN,stone korean kitchen,"4 Embarcadero Ctr, San Francisco, CA 94111, United States",4.3,52.0,13,8,3,0.375
+STONEMILL MATCHA,stonemill matcha,"561 Valencia St, San Francisco, CA 94110, United States",4.4,991.0,3,4,0,0.0
+STREET TACO,street taco,"1607 Haight St, San Francisco, CA 94117, United States",4.5,1368.0,8,20,0,0.0
+STREET TACO,street taco,"83 9th St, San Francisco, CA 94103, United States",4.5,164.0,8,20,0,0.0
+STREET TACO,street taco,"980 16th St, San Francisco, CA 94107, United States",4.4,292.0,8,20,0,0.0
+SUBMARINE CENTER,submarine center,"820 Ulloa St, San Francisco, CA 94127, United States",4.7,598.0,4,7,0,0.0
+SUBWAY,subway,"1000 King Dr Suite 101, Daly City, CA 94015, United States",2.8,74.0,31,11,0,0.0
+SUBWAY,subway,"110 Grand Ave, South San Francisco, CA 94080, United States",3.4,132.0,31,11,0,0.0
+SUBWAY,subway,"1310 El Camino Real Suite D, San Bruno, CA 94066, United States",3.3,207.0,31,11,0,0.0
+SUBWAY,subway,"13501 San Pablo Ave Space A, San Pablo, CA 94806, United States",3.6,132.0,31,11,0,0.0
+SUBWAY,subway,"1400 Mission St Suite 131, San Francisco, CA 94103, United States",3.3,349.0,31,11,0,0.0
+SUBWAY,subway,"147 Mason St, San Francisco, CA 94102, United States",3.5,195.0,31,11,0,0.0
+SUBWAY,subway,"150 Old County Rd, Brisbane, CA 94005, United States",3.9,139.0,31,11,0,0.0
+SUBWAY,subway,"1500 Fillmore St, San Francisco, CA 94115, United States",2.9,173.0,31,11,0,0.0
+SUBWAY,subway,"160 Broadway, San Francisco, CA 94111, United States",3.6,125.0,31,11,0,0.0
+SUBWAY,subway,"160 Donahue St, Marin City, CA 94965, United States",2.9,132.0,31,11,0,0.0
+SUBWAY,subway,"1700 Webster St, Alameda, CA 94501, United States",3.8,161.0,31,11,0,0.0
+SUBWAY,subway,"177 Townsend Street Aka, 170 King St Unit 131, San Francisco, CA 94107, United States",3.0,44.0,31,11,0,0.0
+SUBWAY,subway,"200 Pine St Suite 140, San Francisco, CA 94104, United States",2.7,32.0,31,11,0,0.0
+SUBWAY,subway,"2296 Westborough Blvd, South San Francisco, CA 94080, United States",3.6,111.0,31,11,0,0.0
+SUBWAY,subway,"2599 San Bruno Ave, San Francisco, CA 94134, United States",4.1,127.0,31,11,0,0.0
+SUBWAY,subway,"2675 Geary Blvd E-103, San Francisco, CA 94118, United States",3.3,138.0,31,11,0,0.0
+SUBWAY,subway,"350 Bay St Store #14 Unit 1, San Francisco, CA 94133, United States",3.7,115.0,31,11,0,0.0
+SUBWAY,subway,"37 Skyline Plaza, Daly City, CA 94015, United States",3.6,77.0,31,11,0,0.0
+SUBWAY,subway,"3801 3rd St Suite 310, San Francisco, CA 94124, United States",3.5,104.0,31,11,0,0.0
+SUBWAY,subway,"388 Market St Store #102, San Francisco, CA 94111, United States",3.4,168.0,31,11,0,0.0
+SUBWAY,subway,"3911 Alemany Blvd Suite 1004, San Francisco, CA 94132, United States",4.0,122.0,31,11,0,0.0
+SUBWAY,subway,"397 Golden Gate Ave, San Francisco, CA 94102, United States",3.0,64.0,31,11,0,0.0
+SUBWAY,subway,"3999 San Pablo Ave Store #3999B, Emeryville, CA 94608, United States",3.8,200.0,31,11,0,0.0
+SUBWAY,subway,"408 Montgomery St, San Francisco, CA 94104, United States",3.5,56.0,31,11,0,0.0
+SUBWAY,subway,"425 Bush St, San Francisco, CA 94108, United States",3.5,75.0,31,11,0,0.0
+SUBWAY,subway,"425-D Battery St, San Francisco, CA 94111, United States",3.5,89.0,31,11,0,0.0
+SUBWAY,subway,"4841 Mission St, San Francisco, CA 94110, United States",3.7,100.0,31,11,0,0.0
+SUBWAY,subway,"550B Gene Friend Way, San Francisco, CA 94158, United States",3.4,110.0,31,11,0,0.0
+SUBWAY,subway,"5650 Geary Blvd, San Francisco, CA 94121, United States",3.5,211.0,31,11,0,0.0
+SUBWAY,subway,"5858 Horton St Suite 197, Emeryville, CA 94608, United States",2.7,55.0,31,11,0,0.0
+SUBWAY,subway,"595 Buckingham Way Suite 587, San Francisco, CA 94132, United States",3.1,116.0,31,11,0,0.0
+SUBWAY,subway,"700 4th St #111, San Francisco, CA 94107, United States",3.2,114.0,31,11,0,0.0
+SUBWAY,subway,"7800 El Camino Real, Colma, CA 94014, United States",3.6,94.0,31,11,0,0.0
+SUBWAY,subway,"795 Folsom St, San Francisco, CA 94107, United States",3.5,108.0,31,11,0,0.0
+SUBWAY,subway,"852 N Delaware St, San Mateo, CA 94401, United States",3.1,85.0,31,11,0,0.0
+SUBWAY,subway,"Lower Level Food Court, 170 O'Farrell St #428, San Francisco, CA 94102, United States",3.2,24.0,31,11,0,0.0
+SUBWAY,subway,"Plaza Area, 500 Parnassus Ave level b1, San Francisco, CA 94143, United States",3.6,99.0,31,11,0,0.0
+SUBWAY,subway,"Village At Centennial Square, 750 Font Blvd, San Francisco, CA 94132, United States",3.6,54.0,31,11,0,0.0
+SUM DIM SUM,sum dim sum,"601 Grant Ave, San Francisco, CA 94108, United States",3.8,680.0,2,2,0,0.0
+SUN AND MOON,sun and moon,"415 Brannan St, San Francisco, CA 94107, United States",4.3,390.0,14,8,2,0.25
+SUN FAT SEAFOOD CO,sun fat seafood co,"2687 Mission St, San Francisco, CA 94110, United States",4.7,313.0,11,2,0,0.0
+SUNRISE DELI,sunrise deli,"2115 Irving St, San Francisco, CA 94122, United States",4.2,212.0,6,7,0,0.0
+SUNSET BAKERY,sunset bakery,"1410 9th Ave, San Francisco, CA 94122, United States",4.4,191.0,0,5,0,0.0
+SUNSET CANTINA,sunset cantina,"3414 Judah St, San Francisco, CA 94122, United States",4.5,622.0,15,9,0,0.0
+SUNSET INDIAN CUISINE,sunset indian cuisine,"642 Irving St, San Francisco, CA 94122, United States",4.8,566.0,4,5,0,0.0
+SUPER DUPER BURGERS,super duper burgers,"2201 Chestnut St, San Francisco, CA 94123, United States",4.5,2797.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"2304 Market St, San Francisco, CA 94114, United States",4.5,2349.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"3401 California St, San Francisco, CA 94118, United States",4.5,362.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"721 Market St, San Francisco, CA 94103, United States",4.4,6783.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"737 Irving St, San Francisco, CA 94122, United States",4.2,94.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"783 Mission St, San Francisco, CA 94103, United States",4.5,2733.0,11,13,2,0.15384615384615385
+SUPER DUPER BURGERS,super duper burgers,"98 Mission St, San Francisco, CA 94105, United States",4.4,2244.0,11,13,2,0.15384615384615385
+SURISAN,surisan,"505 Beach St, San Francisco, CA 94133, United States",4.5,2051.0,20,5,1,0.2
+SUSHI ON NORTH BEACH,sushi on north beach,"745 Columbus Ave, San Francisco, CA 94133, United States",4.5,491.0,0,3,0,0.0
+SWAN OYSTER DEPOT,swan oyster depot,"1517 Polk St, San Francisco, CA 94109, United States",4.6,2107.0,2,8,0,0.0
+TABOUN,taboun,"203 Parnassus Ave, San Francisco, CA 94117, United States",4.5,278.0,10,4,0,0.0
+TACO BELL,taco bell,"1610 Jerrold Ave, San Francisco, CA 94124, United States",1.8,28.0,8,1,0,0.0
+TACO BELL,taco bell,"1900 Irving St, San Francisco, CA 94122, United States",2.5,12.0,8,1,0,0.0
+TACO BELL,taco bell,"200 Duboce Ave, San Francisco, CA 94103, United States",3.7,435.0,8,1,0,0.0
+TACO BELL,taco bell,"210 El Camino Real, Millbrae, CA 94030, United States",3.8,698.0,8,1,0,0.0
+TACO BELL,taco bell,"2255 Telegraph Ave, Oakland, CA 94612, United States",3.3,1554.0,8,1,0,0.0
+TACO BELL,taco bell,"40 San Pablo Towne Center, San Pablo, CA 94806, United States",3.8,1196.0,8,1,0,0.0
+TACO BELL,taco bell,"465 El Camino Real, South San Francisco, CA 94080, United States",3.2,1013.0,8,1,0,0.0
+TACO BELL,taco bell,"635 San Pablo Ave, Albany, CA 94706, United States",3.6,729.0,8,1,0,0.0
+TACO BELL,taco bell,"7255 Mission St, Daly City, CA 94014, United States",3.7,979.0,8,1,0,0.0
+TACOS DEL BARRIO,tacos del barrio,"2817 24th St, San Francisco, CA 94110, United States",4.5,150.0,15,3,0,0.0
+TACOS EL PATRON,tacos el patron,"1500 S Van Ness Ave #100, San Francisco, CA 94110, United States",4.6,1369.0,8,8,3,0.375
+TACOS SAN BUENA,tacos san buena,"375 Pacific Ave, San Francisco, CA 94111, United States",3.2,18.0,0,2,0,0.0
+TADICH GRILL,tadich grill,"240 California St, San Francisco, CA 94111, United States",4.5,3009.0,7,9,0,0.0
+TAHONA MERCADO,tahona mercado,"1168 Leavenworth St, San Francisco, CA 94109, United States",4.9,146.0,6,3,0,0.0
+TAJ INDIAN CUISINE,taj indian cuisine,"5701 Geary Blvd, San Francisco, CA 94121, United States",4.8,202.0,11,7,0,0.0
+TAKSIM,taksim,"564 4th St, San Francisco, CA 94107, United States",4.7,355.0,0,1,0,0.0
+TANGLAD,tanglad,"469 Castro St, San Francisco, CA 94114, United States",4.6,359.0,4,5,1,0.2
+TANGUITO,tanguito,"2850 Jones St, San Francisco, CA 94133, United States",4.7,738.0,1,4,0,0.0
+TAQUERIA CANCUN,taqueria cancun,"2288 Mission St, San Francisco, CA 94110, United States",4.5,2479.0,0,5,0,0.0
+TAQUERIA CAZADORES,taqueria cazadores,"1600 Mission St, San Francisco, CA 94103, United States",4.4,377.0,0,6,0,0.0
+TAQUERIA EL FAROLITO,taqueria el farolito,"2950 24th St, San Francisco, CA 94110, United States",4.4,2214.0,0,4,0,0.0
+TAQUERIA LOS MAYAS,taqueria los mayas,"331 Clement St, San Francisco, CA 94118, United States",4.6,1248.0,0,6,0,0.0
+TARA INDIAN CUISINE,tara indian cuisine,"2217 Market St, San Francisco, CA 94114, United States",4.4,532.0,4,6,0,0.0
+TARTINE BAKERY,tartine bakery,"600 Guerrero St, San Francisco, CA 94110, United States",4.5,5770.0,14,7,0,0.0
+TARTINE MANUFACTORY,tartine manufactory,"595 Alabama St, San Francisco, CA 94110, United States",4.5,4197.0,0,6,1,0.16666666666666666
+TASTEBUDS,tastebuds,"600 5th Ave, San Francisco, CA 94118, United States",4.4,282.0,0,1,0,0.0
+TAYLOR STREET COFFEE SHOP,taylor street coffee shop,"375 Taylor St, San Francisco, CA 94102, United States",4.6,1700.0,14,6,0,0.0
+TEAKWOOD,teakwood,"399 Grove St, San Francisco, CA 94102, United States",4.4,293.0,6,4,0,0.0
+TERRA COTTA WARRIOR,terra cotta warrior,"2555 Judah St, San Francisco, CA 94122, United States",4.4,614.0,6,6,0,0.0
+TERZO,terzo,"3011 Steiner St, San Francisco, CA 94123, United States",4.6,347.0,2,3,0,0.0
+THANH TAM II,thanh tam ii,"577 Valencia St, San Francisco, CA 94110, United States",4.4,405.0,15,9,3,0.3333333333333333
+THE ANCHOVY BAR,the anchovy bar,"1740 O'Farrell St, San Francisco, CA 94115, United States",4.6,366.0,0,5,0,0.0
+THE BAKED BEAR,the baked bear,"2824 Jones St, San Francisco, CA 94133, United States",4.6,364.0,3,4,0,0.0
+THE BAKED BEAR,the baked bear,"303 Columbus Ave, San Francisco, CA 94133, United States",4.5,1258.0,3,4,0,0.0
+THE BAKED BEAR,the baked bear,"680 Terry A Francois Blvd, San Francisco, CA 94158, United States",4.4,22.0,3,4,0,0.0
+THE BIRD,the bird,"115 New Montgomery St, San Francisco, CA 94105, United States",4.6,2974.0,3,13,0,0.0
+THE BIRD,the bird,"406 Hayes St, San Francisco, CA 94102, United States",4.2,374.0,3,13,0,0.0
+THE BITE,the bite,"996 Mission St, San Francisco, CA 94103, United States",4.7,851.0,0,3,0,0.0
+THE CANDY STORE,the candy store,"1507 Vallejo St, San Francisco, CA 94109, United States",4.3,84.0,0,1,0,0.0
+THE CHEESECAKE FACTORY,the cheesecake factory,"251 Geary St 8th Floor, San Francisco, CA 94102, United States",3.8,4443.0,0,6,1,0.16666666666666666
+THE COFFEE MOVEMENT,the coffee movement,"1030 Washington St, San Francisco, CA 94108, United States",4.7,1231.0,8,8,0,0.0
+THE COFFEE MOVEMENT,the coffee movement,"1737 Balboa St, San Francisco, CA 94121, United States",4.8,504.0,8,8,0,0.0
+THE CREPE HOUSE,the crepe house,"1755 Polk St, San Francisco, CA 94109, United States",4.5,1229.0,9,6,0,0.0
+THE FRENCH SPOT,the french spot,"1042 Larkin St, San Francisco, CA 94109, United States",4.7,198.0,8,4,0,0.0
+THE FRONT PORCH,the front porch,"65 29th St, San Francisco, CA 94110, United States",4.4,1271.0,0,2,0,0.0
+THE FUDGERY,the fudgery,"The Embarcadero, San Francisco, CA 94133, United States",3.6,130.0,13,2,1,0.5
+THE GOOD CHOCOLATE,the good chocolate,"25 Leland Ave, San Francisco, CA 94134, United States",4.8,19.0,0,3,0,0.0
+THE GOOD LIFE PIZZA,the good life pizza,"3157 Fillmore St, San Francisco, CA 94123, United States",4.5,299.0,5,6,1,0.16666666666666666
+THE HALAL GUYS,the halal guys,"336 O'Farrell St, San Francisco, CA 94102, United States",4.0,2104.0,6,7,0,0.0
+THE HAPPY CRANE,the happy crane,"451 Gough St, San Francisco, CA 94102, United States",4.5,73.0,11,4,0,0.0
+THE ICE CREAM BAR,the ice cream bar,"815 Cole St, San Francisco, CA 94117, United States",4.6,1230.0,0,1,0,0.0
+THE ITALIAN HOMEMADE COMPANY,the italian homemade company,"1 Franklin St, San Francisco, CA 94102, United States",4.4,595.0,46,20,5,0.25
+THE ITALIAN HOMEMADE COMPANY,the italian homemade company,"1919 Union St, San Francisco, CA 94123, United States",4.6,1684.0,46,20,5,0.25
+THE ITALIAN HOMEMADE COMPANY,the italian homemade company,"716 Columbus Ave, San Francisco, CA 94133, United States",4.6,3198.0,46,20,5,0.25
+THE MELT,the melt,"455 Market St at First, Suite #140, San Francisco, CA 94105, United States",4.5,1397.0,15,22,5,0.22727272727272727
+THE MELT,the melt,"925 Market Street, 5th St, San Francisco, CA 94103, United States",4.4,4445.0,15,22,5,0.22727272727272727
+THE MILL,the mill,"736 Divisadero St, San Francisco, CA 94117, United States",4.5,2163.0,0,4,0,0.0
+THE MOCHI DONUT SHOP,the mochi donut shop,"2126 Irving St, San Francisco, CA 94122, United States",4.5,64.0,2,8,0,0.0
+THE MORRIS,the morris,"2501 Mariposa St, San Francisco, CA 94110, United States",4.7,630.0,14,5,1,0.2
+THE NEW SPOT ON POLK,the new spot on polk,"2401 Polk St, San Francisco, CA 94109, United States",4.5,931.0,9,5,0,0.0
+THE OLD CLAM HOUSE,the old clam house,"299 Bayshore Blvd, San Francisco, CA 94124, United States",4.4,1367.0,24,10,1,0.1
+THE ORGANIC COUP,the organic coup,"24 Willie Mays Plaza, San Francisco, CA 94107, United States",2.0,17.0,0,6,0,0.0
+THE PARTHENON,the parthenon,"582 Sutter St, San Francisco, CA 94102, United States",4.7,386.0,5,3,0,0.0
+THE PAWN SHOP,the pawn shop,"993 Mission St, San Francisco, CA 94103, United States",4.6,559.0,10,5,0,0.0
+THE PIZZA PLACE ON NORIEGA,the pizza place on noriega,"3901 Noriega St, San Francisco, CA 94122, United States",4.5,599.0,2,2,0,0.0
+THE PIZZA SHOP,the pizza shop,"3104 24th St, San Francisco, CA 94110, United States",4.5,625.0,3,3,0,0.0
+THE PLANT CAFE ORGANIC,the plant cafe organic,"2335 3rd St, San Francisco, CA 94107, United States",4.2,212.0,17,11,0,0.0
+THE PROGRESS,the progress,"1525 Fillmore St, San Francisco, CA 94115, United States",4.6,1213.0,1,5,0,0.0
+THE ROLL,the roll,"921 Folsom St, San Francisco, CA 94107, United States",4.7,87.0,2,5,0,0.0
+THE SANDWICH PLACE,the sandwich place,"2029 Mission St, San Francisco, CA 94110, United States",4.6,225.0,7,3,0,0.0
+THE SENTINEL,the sentinel,"37 New Montgomery St, San Francisco, CA 94105, United States",4.3,181.0,0,5,1,0.2
+THE SHOTA,the shota,"115 Sansome St, San Francisco, CA 94104, United States",4.8,225.0,0,5,0,0.0
+THE SPANISH TABLE,the spanish table,"130 Clement St, San Francisco, CA 94118, United States",4.5,144.0,0,2,0,0.0
+THE SPICE JAR,the spice jar,"2500 Bryant St, San Francisco, CA 94110, United States",4.5,467.0,15,8,4,0.5
+THE STINKING ROSE,the stinking rose,"430 Columbus Ave, San Francisco, CA 94133, United States",4.2,4471.0,0,5,0,0.0
+THE STORY OF RAMEN,the story of ramen,"3231 24th St, San Francisco, CA 94110, United States",4.5,99.0,2,4,0,0.0
+THE THIRD FLOOR,the third floor,"433 Clay St, San Francisco, CA 94111, United States",4.1,96.0,0,2,0,0.0
+THE VEGAN HOOD CHEFS,the vegan hood chefs,"San Francisco, CA 94124, United States",4.6,27.0,0,1,0,0.0
+THE VILLAGE,the village,"1550 California St, San Francisco, CA 94109, United States",4.5,524.0,8,3,0,0.0
+THIRD WHEEL COFFEE,third wheel coffee,"535 Scott St, San Francisco, CA 94117, United States",5.0,165.0,0,2,0,0.0
+THREE BABES BAKESHOP,three babes bakeshop,"2797 16th St, San Francisco, CA 94103, United States",4.8,160.0,7,7,0,0.0
+TIN ON KEARNY,tin on kearny,"356 Kearny St, San Francisco, CA 94108, United States",4.9,91.0,10,5,0,0.0
+TIYA,tiya,"3213 Scott St, San Francisco, CA 94123, United States",4.6,395.0,2,2,0,0.0
+TODAY FOOD,today food,"601 Kearny St, San Francisco, CA 94108, United States",4.8,399.0,6,1,0,0.0
+TOP SF BBQ,top sf bbq,"2311 Clement St, San Francisco, CA 94121, United States",4.3,238.0,3,2,0,0.0
+TOY BOAT BY JANE,toy boat by jane,"401 Clement St, San Francisco, CA 94118, United States",4.6,402.0,1,6,0,0.0
+TOYOSE,toyose,"3814 Noriega St, San Francisco, CA 94122, United States",4.4,255.0,4,7,0,0.0
+TRATTO,tratto,"501 Geary St, San Francisco, CA 94102, United States",4.2,899.0,11,7,0,0.0
+TRATTORIA CONTADINA,trattoria contadina,"1800 Mason St, San Francisco, CA 94133, United States",4.6,909.0,1,4,0,0.0
+TRATTORIA DA VITTORIO,trattoria da vittorio,"150 W Portal Ave, San Francisco, CA 94127, United States",4.5,828.0,6,7,1,0.14285714285714285
+TRISARA,trisara,"211 Kearny St, San Francisco, CA 94108, United States",4.7,581.0,5,3,0,0.0
+TROPISUENO,tropisueno,"75 Yerba Buena Ln, San Francisco, CA 94103, United States",4.3,3776.0,0,1,0,0.0
+TRULY MEDITERRANEAN,truly mediterranean,"3109 16th St, San Francisco, CA 94103, United States",4.4,835.0,13,10,3,0.3
+TURTLE TOWER,turtle tower,"220 California St, San Francisco, CA 94111, United States",4.1,140.0,7,16,2,0.125
+TUYET MAI,tuyet mai,"547 Hyde St, San Francisco, CA 94109, United States",4.4,79.0,1,7,0,0.0
+UDUPI PALACE,udupi palace,"1007 1/2 Valencia St, San Francisco, CA 94110, United States",4.1,1821.0,5,7,2,0.2857142857142857
+UJI TIME DESSERT,uji time dessert,"121 4th St # 135, San Francisco, CA 94103, United States",4.1,92.0,22,13,2,0.15384615384615385
+UJI TIME DESSERT,uji time dessert,"22 Peace Plaza #440, San Francisco, CA 94115, United States",4.5,526.0,22,13,2,0.15384615384615385
+UMI,umi,"1328 18th St, San Francisco, CA 94107, United States",4.5,302.0,10,5,0,0.0
+UPPER CUT,upper cut,"601 Mission Bay Boulevard North, San Francisco, CA 94158, United States",3.1,46.0,0,6,1,0.16666666666666666
+VERVE COFFEE ROASTERS,verve coffee roasters,"2101 Market St, San Francisco, CA 94114, United States",4.4,823.0,5,6,0,0.0
+VIA AURELIA,via aurelia,"300 Toni Stone Xing Suite A, San Francisco, CA 94158, United States",4.6,45.0,15,8,0,0.0
+VIET QUAN VIETNAMESE NOODLE HOUSE,viet quan vietnamese noodle house,"1757 Taraval St, San Francisco, CA 94116, United States",4.4,159.0,11,7,1,0.14285714285714285
+VILLAGE TEA HOUSE,village tea house,"62 2nd St, San Francisco, CA 94105, United States",4.6,118.0,1,1,0,0.0
+VIVA GOA INDIAN CUISINE,viva goa indian cuisine,"2420 Lombard St, San Francisco, CA 94123, United States",4.2,693.0,2,3,0,0.0
+WARAKU,waraku,"1638 Post St, San Francisco, CA 94115, United States",4.4,794.0,4,6,1,0.16666666666666666
+WAYFARE TAVERN,wayfare tavern,"201 Pine St, San Francisco, CA 94111, United States",4.5,2877.0,11,13,1,0.07692307692307693
+WESTWOOD,westwood,"2036 Lombard St, San Francisco, CA 94123, United States",3.8,351.0,3,3,0,0.0
+WHOLE FOODS MARKET,whole foods market,"1765 California St, San Francisco, CA 94109, United States",4.1,2200.0,61,62,2,0.03225806451612903
+WICKED STAR,wicked star,"601 Mission Bay Boulevard South, San Francisco, CA 94158, United States",3.1,46.0,0,5,1,0.2
+WILDSEED,wildseed,"2000 Union St, San Francisco, CA 94123, United States",4.6,1411.0,1,4,0,0.0
+WING LEE BAKERY,wing lee bakery,"503 Clement St, San Francisco, CA 94118, United States",4.5,299.0,0,6,0,0.0
+WISE SONS JEWISH DELICATESSEN,wise sons jewish delicatessen,"1st St, San Francisco, CA 94105, United States",4.3,20.0,0,1,0,0.0
+WOODEN SPOON,wooden spoon,"2172 Market St, San Francisco, CA 94114, United States",4.6,731.0,9,2,0,0.0
+WRECKING BALL COFFEE ROASTERS,wrecking ball coffee roasters,"2271 Union St, San Francisco, CA 94123, United States",4.4,583.0,2,3,0,0.0
+WYSS TACO TRUCK,wyss taco truck,"2599 Harrison St, San Francisco, CA 94110, United States",4.5,13.0,0,1,0,0.0
+XIAO LONG BAO,xiao long bao,"625 Clement St, San Francisco, CA 94118, United States",4.3,340.0,0,9,0,0.0
+XICA,xica,"1265 Battery St Suite 100, San Francisco, CA 94111, United States",4.6,376.0,11,3,0,0.0
+XOX TRUFFLES,xox truffles,"754 Columbus Ave, San Francisco, CA 94133, United States",4.8,455.0,6,5,0,0.0
+YAKINIKU SHODAI,yakiniku shodai,"1420 Market St, San Francisco, CA 94102, United States",4.7,134.0,1,2,0,0.0
+YAMO,yamo,"3406 18th St, San Francisco, CA 94110, United States",4.4,836.0,3,4,0,0.0
+YIN DU WONTON NOODLE,yin du wonton noodle,"648 Pacific Ave, San Francisco, CA 94133, United States",4.2,407.0,2,8,0,0.0
+YUJI,yuji,"1700 Post St k, San Francisco, CA 94115, United States",4.8,89.0,1,3,0,0.0
+YUMMY BBQ KITCHEN,yummy bbq kitchen,"683 Broadway, San Francisco, CA 94133, United States",3.7,97.0,16,9,3,0.3333333333333333
+YUMMY YUMMY,yummy yummy,"1015 Irving St, San Francisco, CA 94122, United States",4.6,602.0,8,7,2,0.2857142857142857
+ZA PIZZA,za pizza,"1919 Hyde St, San Francisco, CA 94109, United States",4.6,1158.0,3,3,0,0.0
+ZAZIE,zazie,"941 Cole St, San Francisco, CA 94117, United States",4.6,3456.0,0,2,0,0.0
+ZENTAROU SUSHI AND SAKE BAR,zentarou sushi and sake bar,"1380 9th Ave, San Francisco, CA 94122, United States",4.9,180.0,3,8,0,0.0
+ZITOUNA,zitouna,"2435 Clement St, San Francisco, CA 94121, United States",4.8,204.0,3,3,0,0.0
+ZUSHI PUZZLE,zushi puzzle,"1910 Lombard St, San Francisco, CA 94123, United States",4.6,454.0,1,1,0,0.0
