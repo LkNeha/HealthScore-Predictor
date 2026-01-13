@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
@@ -8,6 +8,8 @@ from sklearn.metrics import roc_auc_score, roc_curve, classification_report, con
 import math
 import numpy as np
 import pandas as pd
+from datetime import date
+from typing import Optional
 app = FastAPI()
 
 # ---- CORS so React (localhost:3000) can call this ----
@@ -23,7 +25,7 @@ app.add_middleware(
 # MODEL_PATH = Path(__file__).parent / "model" / "xgboost_tuned_scaleweight.pkl"
 MODEL_PATH='C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
 raw_obj = joblib.load(MODEL_PATH)
-# if you know you saved {"model": xgb_model, ...}
+
 if isinstance(raw_obj, dict) and "model" in raw_obj:
     model = raw_obj["model"]
     scaler = raw_obj.get("scaler", None)
@@ -81,7 +83,7 @@ INSPECTION_OHE_FEATURES = [
     f for f in MODEL_FEATURES if f.startswith("inspection_type_clean_")
 ]
 
-# ---- request / response models ----
+# from frontend (fully engineered feature payload)
 class PredictionInput(BaseModel):
     latitude: float
     longitude: float
@@ -98,14 +100,29 @@ class PredictionInput(BaseModel):
 
 
 class PredictionOutput(BaseModel):
+    # proba1: float
+    # proba0: float
     risk_label: str
     risk_score: float
     outcome_label: int    # 0 or 1
     outcome_text: str 
 
 
+class InspectorPredictionInput(BaseModel):
+    """Simplified payload from Inspector UI.
+
+    Prefer business_id (BusinessName_id in the CSV) for robust matching,
+    but fall back to business_name for backwards compatibility.
+    """
+
+    business_id: Optional[int] = None
+    business_name: Optional[str] = None
+    inspection_type: str
+    inspection_date: date
+
+
 def make_features(data: PredictionInput) -> np.ndarray:
-    feats = {name: 0.0 for name in MODEL_FEATURES}
+    feats = {name: 0.0 for name in MODEL_FEATURES}#make it all 0
 
     feats["latitude"] = data.latitude
     feats["longitude"] = data.longitude
@@ -132,6 +149,156 @@ def make_features(data: PredictionInput) -> np.ndarray:
     arr = np.array([feats[name] for name in MODEL_FEATURES], dtype=float)
     return arr.reshape(1, -1)
 
+
+# ---------- Inspector helper: derive model features from history ----------
+_insp_history_df = None
+
+
+def load_inspection_history_df() -> pd.DataFrame:
+    """Load and cache the encoded inspection history used for inspector predictions."""
+
+    global _insp_history_df
+    if _insp_history_df is not None:
+        return _insp_history_df
+
+    path = "C:/Users/lkneh/HealthScore-Predictor/data/clean/encoded/HealthInspectionsAll.csv"
+    try:
+        df = pd.read_csv(path)
+    except Exception as e:
+        print("Error loading inspection history for /predict-inspector:", e)
+        _insp_history_df = pd.DataFrame()
+        return _insp_history_df
+
+    _insp_history_df = df
+    return _insp_history_df
+
+
+def _safe_series_float(row: pd.Series, col: str, default: float = 0.0) -> float:
+    if col not in row.index:
+        return default
+    val = row[col]
+    if pd.isna(val):
+        return default
+    try:
+        return float(val)
+    except Exception:
+        return default
+
+
+def _clean_inspection_type_label(raw: str) -> str:
+    """Map UI inspection type text to the cleaned labels used in MODEL_FEATURES.
+
+    e.g. "Routine Inspection" -> "routine" so that
+    col = "inspection_type_clean_routine" exists.
+    """
+
+    if raw is None:
+        return "nan"
+    s = str(raw).strip().lower()
+    if s.endswith(" inspection"):
+        s = s[: -len(" inspection")]
+    return s or "nan"
+
+
+def build_numeric_prediction_for_inspector(
+    input_data: InspectorPredictionInput,
+) -> PredictionInput:
+
+    df = load_inspection_history_df()
+    if df.empty:
+        raise HTTPException(status_code=500, detail="Inspection history not available")
+
+    biz_df = df.copy()
+
+    # Prefer lookup by BusinessName_id if business_id is provided
+    if input_data.business_id is not None:
+        if "BusinessName_id" not in biz_df.columns:
+            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName_id column")
+        biz_df = biz_df[biz_df["BusinessName_id"] == input_data.business_id]
+    else:
+        # Fallback: lookup by BusinessName string
+        if "BusinessName" not in biz_df.columns:
+            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName column")
+
+        if not input_data.business_name:
+            raise HTTPException(status_code=400, detail="Business name or id is required")
+
+        key = input_data.business_name.strip().upper()
+        biz_df["_name_key"] = biz_df["BusinessName"].astype(str).str.strip().str.upper()
+        biz_df = biz_df[biz_df["_name_key"] == key]
+
+    if biz_df.empty:
+        raise HTTPException(status_code=404, detail="No inspection history found for this business")
+
+    # Build an inspection datetime for each historical record
+    required_date_cols = {"insp_year", "insp_month", "insp_day"}
+    if not required_date_cols.issubset(biz_df.columns):
+        raise HTTPException(status_code=500, detail="Inspection history missing insp_year/month/day columns")
+
+    biz_df = biz_df.copy()
+    biz_df["_insp_datetime"] = pd.to_datetime(
+        dict(
+            year=biz_df["insp_year"],
+            month=biz_df["insp_month"],
+            day=biz_df["insp_day"],
+        ),
+        errors="coerce",
+    )
+    biz_df = biz_df.dropna(subset=["_insp_datetime"])
+    if biz_df.empty:
+        raise HTTPException(status_code=404, detail="No dated inspections found for this business")
+
+    target_ts = pd.Timestamp(input_data.inspection_date)
+    hist = biz_df[biz_df["_insp_datetime"] < target_ts].sort_values("_insp_datetime")
+
+    if hist.empty:
+        # If there is no prior inspection before the chosen date, fall back to the
+        # latest known inspection for this business.
+        last_row = biz_df.sort_values("_insp_datetime").iloc[-1]
+    else:
+        last_row = hist.iloc[-1]
+
+    # Core numeric features inferred from the latest known inspection
+    latitude = _safe_series_float(last_row, "latitude", 0.0)
+    longitude = _safe_series_float(last_row, "longitude", 0.0)
+    avg_viol_last_3 = _safe_series_float(last_row, "avg_violations_last_3", 0.0)
+    fail_rate_last_3 = _safe_series_float(last_row, "fail_rate_last_3", 0.0)
+    trend_last_3 = _safe_series_float(last_row, "trend_last_3", 0.0)
+
+    # Days since last inspection: difference between requested date and last known inspection
+    last_insp_ts = last_row["_insp_datetime"]
+    days_since_last = max(0, int((target_ts - last_insp_ts).days))
+
+    # Date‑based features for the *new* inspection
+    insp_year = int(input_data.inspection_date.year)
+    insp_month = int(input_data.inspection_date.month)
+    insp_day = int(input_data.inspection_date.day)
+
+    # Convert Python weekday (Mon=0..Sun=6) to 0=Sun..6=Sat to stay
+    # consistent with how the UI labels days of week.
+    dow_py = input_data.inspection_date.weekday()
+    insp_dow = (dow_py + 1) % 7
+
+    clean_type = _clean_inspection_type_label(input_data.inspection_type)
+
+    return PredictionInput(
+        latitude=latitude,
+        longitude=longitude,
+        avg_violations_last_3=avg_viol_last_3,
+        fail_rate_last_3=fail_rate_last_3,
+        days_since_last_inspection=days_since_last,
+        trend_last_3=trend_last_3,
+        insp_year=insp_year,
+        insp_month=insp_month,
+        insp_day=insp_day,
+        insp_dow=insp_dow,
+        # We currently do not recompute insp_days_since_ref; the
+        # model has been operating with 0 here from the UI, so we
+        # keep that behaviour.
+        insp_days_since_ref=0,
+        inspection_type=clean_type,
+    )
+
 @app.get("/test-model")
 def test_model():
     # build a dummy X with correct shape
@@ -146,11 +313,14 @@ def test_model():
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(input_data: PredictionInput):
+    # print("Received? input:", input_data)
     X = make_features(input_data)
-    proba = float(model.predict_proba(X)[0, 1])  # adjust if not binary
-    p_fail = float(model.predict_proba(X)[0, 1])  # assuming classes_ == [0,1] and 1 == fail
+    print("Constructed features:", X)
+    proba = float(model.predict_proba(X)[0,1])  # adjust if not binary
+    print(proba)
+    # p_fail = float(model.predict_proba(X)[0, 1])  # assuming classes_ == [0,1] and 1 == fail
     y_hat = int(model.predict(X)[0])
-    print(type(raw_obj), getattr(raw_obj, "keys", lambda: None)())
+    # print(type(raw_obj), getattr(raw_obj, "keys", lambda: None)())
 
     # <0.4 = LOW, 0.4–0.7 = MEDIUM, >0.7 = HIGH.
     if proba > 0.7:
@@ -161,6 +331,35 @@ def predict(input_data: PredictionInput):
         label = "LOW"
     outcome_text = "FAIL" if y_hat == 1 else "PASS"
     return PredictionOutput(risk_label=label, risk_score=proba,outcome_label=y_hat,outcome_text=outcome_text,)
+
+
+@app.post("/predict-inspector", response_model=PredictionOutput)
+def predict_inspector(input_data: InspectorPredictionInput):
+    """Inspector‑focused prediction.
+
+    Frontend sends only business name, inspection type, and target date.
+    Backend reconstructs all engineered features from historical data.
+    """
+
+    numeric_input = build_numeric_prediction_for_inspector(input_data)
+    X = make_features(numeric_input)
+    proba = float(model.predict_proba(X)[0, 1])
+    y_hat = int(model.predict(X)[0])
+
+    if proba > 0.7:
+        label = "HIGH"
+    elif proba >= 0.4:
+        label = "MEDIUM"
+    else:
+        label = "LOW"
+
+    outcome_text = "FAIL" if y_hat == 1 else "PASS"
+    return PredictionOutput(
+        risk_label=label,
+        risk_score=proba,
+        outcome_label=y_hat,
+        outcome_text=outcome_text,
+    )
 def safe_float(x):
     # convert to 0.0 
     if x is None:
