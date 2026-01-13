@@ -3,7 +3,7 @@
 const BASE_URL = "http://localhost:8000";
 
 export async function runPrediction(payload) {
-  const res = await fetch(`${BASE_URL}/predict`, {
+  const res = await fetch(`${BASE_URL}/predict-inspector`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

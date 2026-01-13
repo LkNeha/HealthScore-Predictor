@@ -41,14 +41,9 @@ export default function InspectorDashboard({ onBack }) {
   //   setShowAnswer(false);
   // };
   const [form, setForm] = useState({
-    latitude: "",
-    longitude: "",
+    businessName: "",
+    inspectionDate: "",
     inspectionType: "",
-    avgViolationsLast3: "",
-    daysSinceLastInspection: "",
-    trendLast3: "",
-    lastInspectionDate: "",
-    currentDate: "",
   });
   
 
@@ -81,13 +76,13 @@ export default function InspectorDashboard({ onBack }) {
     }
   }, [step]);
   const trends = insights?.inspection_trends || [];
-  const dowMonthHeatmap = insights?.dow_month_heatmap || [];
+  
   const delayStats = insights?.inspection_delay_stats || [];
-  const neighbourhoods = insights?.neighbourhood_analysis || [];
+  
   const riskDist = insights?.inspection_year_pie || [];
-  const severityDist = insights?.violation_severity_pie || [];
+  
   const hasYearPie = Array.isArray(riskDist) && riskDist.length > 0;
-  const hasSeverityPie = Array.isArray(severityDist) && severityDist.length > 0;
+  
   const highRisk = insights?.high_risk_records || [];
   const [highRiskLimit, setHighRiskLimit] = useState(10);
   const highRiskToShow = highRisk.slice(0, highRiskLimit);
@@ -116,47 +111,30 @@ export default function InspectorDashboard({ onBack }) {
     setError(null);
     setShowAnswer(false);
 
-    // Derive date-based features from the selected dates
-    const currentDateObj = form.currentDate ? new Date(form.currentDate) : null;
-    const lastInspectionDateObj = form.lastInspectionDate
-      ? new Date(form.lastInspectionDate)
+    // Derive date-based features from the selected inspection date
+    const inspectionDateObj = form.inspectionDate
+      ? new Date(form.inspectionDate)
       : null;
 
     const isValidDate = (d) => d instanceof Date && !Number.isNaN(d.getTime());
 
-    let derivedDaysSinceLast = Number(form.daysSinceLastInspection) || 0;
     let inspYear = 0;
     let inspMonth = 0;
     let inspDay = 0;
     let inspDow = 0; // 0 (Sunday) - 6 (Saturday)
 
-    if (isValidDate(currentDateObj)) {
-      inspYear = currentDateObj.getFullYear();
-      inspMonth = currentDateObj.getMonth() + 1; // JS months are 0-based
-      inspDay = currentDateObj.getDate();
-      inspDow = currentDateObj.getDay();
-    }
-
-    if (isValidDate(currentDateObj) && isValidDate(lastInspectionDateObj)) {
-      const diffMs = currentDateObj.getTime() - lastInspectionDateObj.getTime();
-      const msPerDay = 1000 * 60 * 60 * 24;
-      derivedDaysSinceLast = Math.max(0, Math.round(diffMs / msPerDay));
+    if (isValidDate(inspectionDateObj)) {
+      inspYear = inspectionDateObj.getFullYear();
+      inspMonth = inspectionDateObj.getMonth() + 1; // JS months are 0-based
+      inspDay = inspectionDateObj.getDate();
+      inspDow = inspectionDateObj.getDay();
     }
 
     try {
       const data = await runPrediction({
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
-        avg_violations_last_3: Number(form.avgViolationsLast3),
-        fail_rate_last_3: 0,                      // TODO from UI
-        days_since_last_inspection: derivedDaysSinceLast,
-        trend_last_3: Number(form.trendLast3),
-        insp_year: inspYear,
-        insp_month: inspMonth,
-        insp_day: inspDay,
-        insp_dow: inspDow,
-        insp_days_since_ref: 0,
-        inspection_type: form.inspectionType,     // must match backend mapping
+        business_name: form.businessName,
+        inspection_type: form.inspectionType,
+        inspection_date: form.inspectionDate,
       });
 
       setPrediction(data);
@@ -715,7 +693,8 @@ export default function InspectorDashboard({ onBack }) {
             <div>
               <h2>Pass or Closure?</h2>
               <p className="prediction-sub">
-                Quickly estimate restaurant risk based on key factors.
+                Quickly estimate restaurant risk based on business and
+                inspection details.
               </p>
             </div>
             {/* <button className="ghost-btn" onClick={resetFlow}>
@@ -725,13 +704,24 @@ export default function InspectorDashboard({ onBack }) {
 
           <div className="prediction-grid">
             <div className="field">
-              <label>Latitude</label>
-              <input placeholder="Enter a number" value={form.latitude} onChange={updateField("latitude")} />
+              <label>Business Name</label>
+              <input
+                placeholder="Enter business name"
+                value={form.businessName}
+                onChange={updateField("businessName")}
+              />
             </div>
+
             <div className="field">
-              <label>Longitude</label>
-              <input placeholder="Enter a number" value={form.longitude} onChange={updateField("longitude")} />
+              <label>Date</label>
+              <input
+                type="date"
+                placeholder="Select inspection date"
+                value={form.inspectionDate}
+                onChange={updateField("inspectionDate")}
+              />
             </div>
+
             <div className="field">
               <label>Inspection Type</label>
               <select className="select-inspection"
@@ -761,33 +751,6 @@ export default function InspectorDashboard({ onBack }) {
                 <option>Structural inspection</option>
                 <option>Nan</option>
               </select>
-            </div>
-
-            {/* <div className="field">
-              <label>Voilation Count</label>
-              <input placeholder="Enter a number" /> */}
-            {/* </div> */}
-
-            <div className="field">
-              <label>Average Voilation</label>
-              <input placeholder="Last three outcomes" value={form.avgViolationsLast3} onChange={updateField("avgViolationsLast3")} />
-            </div>
-
-            <div className="field">
-              <label>Fail rate</label>
-              <input placeholder="Fail rate for last 3 inspections" value={form.daysSinceLastInspection} onChange={updateField("daysSinceLastInspection")} />
-            </div>
-            <div className="field">
-              <label>Trend</label>
-              <input placeholder="-ve if growth is good else +ve" value={form.trendLast3} onChange={updateField("trendLast3")} />
-            </div>
-            <div className="field">
-              <label>Last Inspection</label>
-              <input type="date" placeholder="number of Days since last inspection" value={form.lastInspectionDate} onChange={updateField("lastInspectionDate")} />
-            </div>
-            <div className="field">
-              <label>Date</label>
-              <input type="date" placeholder="select date" value={form.currentDate} onChange={updateField("currentDate")} />
             </div>
           </div>
 
