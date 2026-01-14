@@ -18,9 +18,29 @@ import {
   ScatterChart,
   Scatter,
   ZAxis,
-  ComposedChart,
 } from "recharts";
 import CountUp from "react-countup";
+
+const FACILITY_STATUS_LABELS = {
+  0: "Pass",
+  1: "Conditional Pass",
+  2: "Fail",
+};
+
+function renderInspectorStatus(statusLabel, numericValue) {
+  if (statusLabel) {
+    return statusLabel;
+  }
+  if (numericValue === null || numericValue === undefined) {
+    return "-";
+  }
+  const parsed = Number(numericValue);
+  if (Number.isNaN(parsed)) {
+    return "-";
+  }
+  return FACILITY_STATUS_LABELS[parsed] || "Unknown";
+}
+
 export default function InspectorDashboard({ onBack }) {
   const [step, setStep] = useState("choice"); // choice, auth, risk, predict
   const [selectedAction, setSelectedAction] = useState(null);
@@ -44,6 +64,7 @@ export default function InspectorDashboard({ onBack }) {
     businessName: "",
     inspectionDate: "",
     inspectionType: "",
+    analysisNeighborhood: "",
   });
   
 
@@ -77,11 +98,16 @@ export default function InspectorDashboard({ onBack }) {
   }, [step]);
   const trends = insights?.inspection_trends || [];
   
-  const delayStats = insights?.inspection_delay_stats || [];
+  const neighborhoodFails = (insights?.neighborhood_fail_stats || []).slice(0, 12);
   
-  const riskDist = insights?.inspection_year_pie || [];
+  const failYearPie = trends
+    .map((row) => ({
+      label: row?.year,
+      value: row?.fail_count || 0,
+    }))
+    .filter((row) => row.label != null && row.value > 0);
   
-  const hasYearPie = Array.isArray(riskDist) && riskDist.length > 0;
+  const hasYearPie = failYearPie.length > 0;
   
   const highRisk = insights?.high_risk_records || [];
   const [highRiskLimit, setHighRiskLimit] = useState(10);
@@ -135,6 +161,7 @@ export default function InspectorDashboard({ onBack }) {
         business_name: form.businessName,
         inspection_type: form.inspectionType,
         inspection_date: form.inspectionDate,
+        analysis_neighborhood: form.analysisNeighborhood,
       });
 
       setPrediction(data);
@@ -297,21 +324,24 @@ export default function InspectorDashboard({ onBack }) {
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="total"
-                    name="Total inspections"
-                    stroke="#3b82f6"   /* primary accent */
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="fails"
-                    name="Failures"
-                    stroke="#ef4444"   /* fail accent */
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="passes"
-                    name="Non-failures"
+                    dataKey="pass_count"
+                    name="Pass"
                     stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="conditional_count"
+                    name="Conditional Pass"
+                    stroke="#0077b6"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="fail_count"
+                    name="Fail"
+                    stroke="#c1121f"
+                    strokeWidth={2}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -380,6 +410,7 @@ export default function InspectorDashboard({ onBack }) {
                         "Fails",
                         "Fail rate",
                         "Avg violations",
+                        "Facility status",
                         "Year",
                       ].map((h) => (
                         <th
@@ -450,6 +481,15 @@ export default function InspectorDashboard({ onBack }) {
                           {r.avg_violations != null
                             ? r.avg_violations.toFixed(2)
                             : "-"}
+                        </td>
+                        <td
+                          style={{
+                            padding: "8px 12px",
+                            borderTop: "1px solid #111827",
+                            borderRight: "1px solid #111827",
+                          }}
+                        >
+                          {renderInspectorStatus(r.status_label, r.facility_rating_status)}
                         </td>
                         <td
                           style={{
@@ -572,9 +612,9 @@ export default function InspectorDashboard({ onBack }) {
               )}
             </div> */}
 
-            {/* Distribution Pies (Year + Violation Severity) */}
+            {/* Distribution Pie: Fail Counts by Year */}
             <div className="panel">
-              <h3>Risk Distributions</h3>
+              <h3>Fail Distribution by Year</h3>
               <div>
                 <h4
                   style={{
@@ -583,21 +623,21 @@ export default function InspectorDashboard({ onBack }) {
                     color: "#9ca3af",
                   }}
                 >
-                  By Year
+                  Inspections rated Fail (status 2)
                 </h4>
                 {hasYearPie ? (
                   <ResponsiveContainer width="100%" height={260}>
                     <PieChart>
-                      <Tooltip formatter={(v, n) => [`${v}`, n]} />
+                      <Tooltip formatter={(v, n) => [`${v}`, "Fails"]} />
                       <Legend />
                       <Pie
-                        data={riskDist}
+                        data={failYearPie}
                         dataKey="value"
                         nameKey="label"
                         outerRadius={110}
                         paddingAngle={3}
                       >
-                        {riskDist.map((entry, index) => (
+                        {failYearPie.map((entry, index) => (
                           <Cell
                             key={`year-cell-${index}`}
                             fill={pieColors[index % pieColors.length]}
@@ -608,77 +648,58 @@ export default function InspectorDashboard({ onBack }) {
                   </ResponsiveContainer>
                 ) : (
                   <p className="prediction-sub">
-                    No year distribution data available.
+                    No fail counts detected for the selected years.
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Operational / Scheduling View: Risk vs Days Since Last Inspection */}
             <div className="panel">
-              <h3>Risk vs Time Since Last Inspection</h3>
+              <h3>Neighborhood Fail Hotspots</h3>
               <p className="prediction-sub" style={{ marginBottom: 8 }}>
-                Bars show inspection volume; line shows fail probability by delay bucket.
+                Count of inspections rated as fail (status 2) by analysis neighborhood.
               </p>
-              {delayStats.length > 0 ? (
-                <ResponsiveContainer width="100%" height={260}>
-                  <ComposedChart data={delayStats} margin={{ left: -10 }}>
+              {neighborhoodFails.length > 0 ? (
+                <div className="chart-scroll-wrapper">
+                  <ResponsiveContainer width={Math.min(1200, neighborhoodFails.length * 120)} height={280}>
+                    <BarChart data={neighborhoodFails} margin={{ left: -10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis
-                      dataKey="bucket"
-                      stroke="#111827"
+                      dataKey="neighborhood"
+                      interval={0}
+                      angle={-25}
+                      textAnchor="end"
+                      height={90}
                       tick={{ fontSize: 11, fill: "#111827" }}
                     />
                     <YAxis
-                      yAxisId="left"
-                      stroke="#111827"
-                      tick={{ fontSize: 11, fill: "#111827" }}
                       allowDecimals={false}
-                      name="Inspections"
-                    />
-                    <YAxis
-                      yAxisId="right"
-                      orientation="right"
-                      stroke="#4b5563"
-                      tick={{ fontSize: 11, fill: "#4b5563" }}
-                      domain={[0, 1]}
-                      tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                      name="Fail rate"
+                      stroke="#111827"
+                      tick={{ fontSize: 11, fill: "#111827" }}
                     />
                     <Tooltip
-                      formatter={(value, name) => {
-                        if (name === "total") return [value, "Inspections"];
-                        if (name === "fail_rate")
-                          return [
-                            `${(value * 100).toFixed(1)}%`,
-                            "Fail rate",
-                          ];
-                        if (name === "fails") return [value, "Fails"];
+                      formatter={(value, name, payload) => {
+                        if (name === "fails") return [value, "Fails (rating 2)"];
+                        if (name === "total") return [value, "Total inspections"];
+                        if (name === "fail_rate") {
+                          return [`${(value * 100).toFixed(1)}%`, "Fail rate"];
+                        }
                         return [value, name];
                       }}
                     />
                     <Legend />
                     <Bar
-                      yAxisId="left"
-                      dataKey="total"
-                      name="Inspections"
-                      fill="#3b82f6"
+                      dataKey="fails"
+                      name="Fails (rating 2)"
+                      fill="#ef4444"
                       radius={[4, 4, 0, 0]}
                     />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="fail_rate"
-                      name="Fail rate"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
+                  </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
                 <p className="prediction-sub">
-                  Delay bucket statistics not available for this dataset.
+                  Neighborhood fail distribution not available for this dataset.
                 </p>
               )}
             </div>
@@ -750,6 +771,56 @@ export default function InspectorDashboard({ onBack }) {
                 <option>Structural</option>
                 <option>Structural inspection</option>
                 <option>Nan</option>
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Neighbourhood (analysis)</label>
+              <select
+                value={form.analysisNeighborhood}
+                onChange={updateField("analysisNeighborhood")}
+              >
+                <option value="">Select neighbourhood</option>
+                <option value="analysis_neighborhood_Bernal Heights">Bernal Heights</option>
+                <option value="analysis_neighborhood_Castro/Upper Market">Castro/Upper Market</option>
+                <option value="analysis_neighborhood_Chinatown">Chinatown</option>
+                <option value="analysis_neighborhood_Excelsior">Excelsior</option>
+                <option value="analysis_neighborhood_Financial District/South Beach">Financial District/South Beach</option>
+                <option value="analysis_neighborhood_Glen Park">Glen Park</option>
+                <option value="analysis_neighborhood_Golden Gate Park">Golden Gate Park</option>
+                <option value="analysis_neighborhood_Haight Ashbury">Haight Ashbury</option>
+                <option value="analysis_neighborhood_Hayes Valley">Hayes Valley</option>
+                <option value="analysis_neighborhood_Inner Richmond">Inner Richmond</option>
+                <option value="analysis_neighborhood_Inner Sunset">Inner Sunset</option>
+                <option value="analysis_neighborhood_Japantown">Japantown</option>
+                <option value="analysis_neighborhood_Lakeshore">Lakeshore</option>
+                <option value="analysis_neighborhood_Lincoln Park">Lincoln Park</option>
+                <option value="analysis_neighborhood_Lone Mountain/USF">Lone Mountain/USF</option>
+                <option value="analysis_neighborhood_Marina">Marina</option>
+                <option value="analysis_neighborhood_McLaren Park">McLaren Park</option>
+                <option value="analysis_neighborhood_Mission">Mission</option>
+                <option value="analysis_neighborhood_Mission Bay">Mission Bay</option>
+                <option value="analysis_neighborhood_Nob Hill">Nob Hill</option>
+                <option value="analysis_neighborhood_Noe Valley">Noe Valley</option>
+                <option value="analysis_neighborhood_North Beach">North Beach</option>
+                <option value="analysis_neighborhood_Oceanview/Merced/Ingleside">Oceanview/Merced/Ingleside</option>
+                <option value="analysis_neighborhood_Outer Mission">Outer Mission</option>
+                <option value="analysis_neighborhood_Outer Richmond">Outer Richmond</option>
+                <option value="analysis_neighborhood_Pacific Heights">Pacific Heights</option>
+                <option value="analysis_neighborhood_Portola">Portola</option>
+                <option value="analysis_neighborhood_Potrero Hill">Potrero Hill</option>
+                <option value="analysis_neighborhood_Presidio">Presidio</option>
+                <option value="analysis_neighborhood_Presidio Heights">Presidio Heights</option>
+                <option value="analysis_neighborhood_Russian Hill">Russian Hill</option>
+                <option value="analysis_neighborhood_Seacliff">Seacliff</option>
+                <option value="analysis_neighborhood_South of Market">South of Market</option>
+                <option value="analysis_neighborhood_Sunset/Parkside">Sunset/Parkside</option>
+                <option value="analysis_neighborhood_Tenderloin">Tenderloin</option>
+                <option value="analysis_neighborhood_Treasure Island">Treasure Island</option>
+                <option value="analysis_neighborhood_Twin Peaks">Twin Peaks</option>
+                <option value="analysis_neighborhood_Visitacion Valley">Visitacion Valley</option>
+                <option value="analysis_neighborhood_West of Twin Peaks">West of Twin Peaks</option>
+                <option value="analysis_neighborhood_Western Addition">Western Addition</option>
               </select>
             </div>
           </div>

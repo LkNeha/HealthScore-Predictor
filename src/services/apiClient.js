@@ -27,6 +27,19 @@ export async function lookupBusinessCustomer(name) {
   return res.json();
 }
 
+export async function fetchCustomerNeighborhoods(name) {
+  const endpoint = name
+    ? `${BASE_URL}/customer-neighborhoods?name=${encodeURIComponent(name)}`
+    : `${BASE_URL}/customer-neighborhoods`;
+
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.status}`);
+  }
+
+  return res.json();
+}
+
 
 // example: GET /api/inspections
 // export async function getInspections(params) {

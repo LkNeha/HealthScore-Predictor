@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DashboardCards from "../components/DashboardCards";
 import InspectorDashboard from "../components/InspectorDashboard";
-import CustomerDashboard from "../components/CustomerDashboard";
+import CustomerPortal from "../components/CustomerPortal";
 import ExploreDashboard from "../components/ExploreDashboard";
 import DataDashboard from "../components/DataDashboard";
 import "../pages/AnalyticsDashboard.css";
@@ -58,13 +58,13 @@ export default function AnalyticsDashboard() {
                             </div>
 
                             <div className="metric-block">
-                                <div className="metric-value"><CountUp end={7.1} duration={2} suffix="%" /></div>
+                                <div className="metric-value"><CountUp end={2.6} duration={2} suffix="%" /></div>
                                 <div className="metric-label">facilities compliant</div>
                             </div>
 
                             <div className="metric-block">
                                 <div className="metric-value">
-                                    <CountUp end={1453} duration={2} />
+                                    <CountUp end={589} duration={2} />
                                 </div>
                                 <div className="metric-label">high‑risk alerts flagged</div>
                             </div>
@@ -81,9 +81,7 @@ export default function AnalyticsDashboard() {
                         )}
 
                         {activeDashboard === "customer" && (
-                            <CustomerDashboard
-                                key={dashboardClicks.customer}
-                            />
+                            <CustomerPortal key={dashboardClicks.customer} />
                         )}
                         {activeDashboard === "data" && (
                             <DataDashboard
