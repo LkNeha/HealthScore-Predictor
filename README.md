@@ -28,7 +28,7 @@ Health inspections are typically reactive, conducted periodically or in response
 ### Machine Learning Pipeline
 - **Multiple Model Architectures**: Implements Random Forest, XGBoost, and Gradient Boosting classifiers
 - **Robust Evaluation Framework**: Uses stratified cross-validation and comprehensive metrics (ROC-AUC, precision, recall, F1-score)
-- **Class Imbalance Handling**: Giving more preference to class 1 and class 2 labels
+- **Class Imbalance Handling**: Employs class weighting techniques to address imbalanced datasets
 - **Feature Importance Analysis**: Identifies key predictors of health inspection outcomes
 
 ### Temporal Analysis
@@ -42,7 +42,7 @@ Health inspections are typically reactive, conducted periodically or in response
 - **Pandas & NumPy**: Data manipulation and numerical computing
 - **Scikit-learn**: Machine learning algorithms and evaluation metrics
 - **XGBoost**: Gradient boosting implementation
-- **Imbalanced-learn**: SMOTE and resampling techniques
+- **Imbalanced-learn**: Resampling techniques for class imbalance
 - **Matplotlib & Seaborn**: Data visualization
 - **FuzzyWuzzy**: Fuzzy string matching for data integration
 - **Geopy**: Geographic distance calculations
@@ -77,6 +77,8 @@ HealthScore-Predictor/
 │
 ├── data/                  # Raw and processed data files
 ├── notebooks/             # Jupyter notebooks for analysis
+├── backend/               # Backend API and server code
+├── dashboardv1/           # Dashboard application files
 ├── main.ipynb            # Main analysis notebook
 ├── requirement.txt       # Project dependencies
 └── README.md            # Project documentation
@@ -130,7 +132,7 @@ Comprehensive evaluation metrics are used to assess model performance:
 
 ### 3. Addressing Data Challenges
 - **Temporal Leakage Prevention**: Strict time-based train/test splits
-- **Class Imbalance**: SMOTE oversampling and class weight adjustment
+- **Class Imbalance**: Class weight adjustment and resampling strategies
 - **Feature Selection**: Recursive feature elimination and importance analysis
 
 ### 4. Model Development
@@ -160,7 +162,7 @@ The models demonstrate the feasibility of predicting restaurant health inspectio
 Implemented strict temporal validation to ensure models only use information available at prediction time, preventing unrealistic performance estimates.
 
 ### Class Imbalance
-The dataset exhibits significant imbalance between passing and failing restaurants. Applied SMOTE and class weighting to ensure models learn from minority class examples.
+The dataset exhibits significant imbalance between passing and failing restaurants. Applied class weighting to ensure models learn from minority class examples.
 
 ### Data Quality
 Restaurant names and addresses often have inconsistencies. Developed robust matching algorithms using multiple signals (name similarity, geographic proximity, address normalization).
