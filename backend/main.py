@@ -26,14 +26,23 @@ app.add_middleware(
 #     ).astype(int)
 
 # MODEL_PATH = Path(__file__).parent / "model" / "xgboost_tuned_scaleweight.pkl"
-MODEL_PATH='C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
+MODEL_PATH = 'C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
 raw_obj = joblib.load(MODEL_PATH)
 _customer_join_cache = None
 _neighborhood_feature_df = None
 _google_clean_cache = None
+_rf_multiclass_model = None
+_xgb_multiclass_model = None
+_xgb_multiclass_scaler = None
+_model_dataset_cache = None
 
 NEIGHBORHOOD_SOURCE_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/Visualization_HealthInspections.csv"
 GOOGLE_CLEAN_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/google_cleaned.csv"
+MULTICLASS_DATASET_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/model_dataset.csv"
+RF_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/random_forest_multiclass.pkl"
+XGB_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/xgboost_multiclass_model_20260115_000350.pkl"
+MULTICLASS_SCALER_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/scaler_20260115_000350.pkl"
+METRICS_PKL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/model_metrics_20260115_000350.pkl"
 TOP_SCORE_THRESHOLD = 3000
 MIN_INSPECTION_DATE = pd.Timestamp("2023-01-01")
 
@@ -53,7 +62,7 @@ else:
 
 #input features used by the model
 MODEL_FEATURES = [
-    "facility_rating_status",
+    # "facility_rating_status",
     "violation_count",
     "has_violation_count",
     "prev_rating_majority_3",
@@ -123,9 +132,8 @@ NEIGHBOURHOOD_OHE_FEATURES = [
 ]
 
 
-# from frontend (compact payload)
+# from frontend (compact payload for model features)
 class PredictionInput(BaseModel):
-    facility_rating_status: float
     violation_count: float
     has_violation_count: int
     prev_rating_majority_3: float
@@ -136,20 +144,29 @@ class PredictionInput(BaseModel):
     inspection_type: str
 
 
+class PredictRequest(BaseModel):
+    business_name: str
+    inspection_type: str
+    inspection_date: date
+    analysis_neighborhood: str
+    # Optional override for the current inspection's violation count.
+    # If provided, it will replace the violation_count and has_violation_count
+    # derived from the visualization dataset when building features.
+    violation_count: Optional[float] = None
+
+
 class PredictionOutput(BaseModel):
     # proba1: float
     # proba0: float
     risk_label: str
     risk_score: float
     outcome_label: int    # 0 or 1
-    outcome_text: str 
-
-
-class InspectorPredictionInput(BaseModel):
-    business_id: Optional[int] = None
-    business_name: Optional[str] = None
-    inspection_type: str
-    inspection_date: date
+    outcome_text: str
+    # Multiclass details (optional; used by /predict)
+    proba_pass: Optional[float] = None
+    proba_conditional: Optional[float] = None
+    proba_fail: Optional[float] = None
+    predicted_class_label: Optional[str] = None
 
 
 def make_features(data: PredictionInput) -> np.ndarray:
@@ -157,7 +174,6 @@ def make_features(data: PredictionInput) -> np.ndarray:
     feats = {name: 0.0 for name in MODEL_FEATURES}
 
     # scalar features
-    feats["facility_rating_status"] = float(data.facility_rating_status)
     feats["violation_count"] = float(data.violation_count)
     feats["has_violation_count"] = float(data.has_violation_count)
     feats["prev_rating_majority_3"] = float(data.prev_rating_majority_3)
@@ -177,28 +193,15 @@ def make_features(data: PredictionInput) -> np.ndarray:
         feats[col] = 1.0
 
     arr = np.array([feats[name] for name in MODEL_FEATURES], dtype=float)
-    return arr.reshape(1, -1)
 
-
-_insp_history_df = None
-def load_inspection_history_df() -> pd.DataFrame:
-    """Load and cache the encoded inspection history used for inspector predictions."""
-
-    global _insp_history_df
-    if _insp_history_df is not None:
-        return _insp_history_df
-
-    path = "C:/Users/lkneh/HealthScore-Predictor/data/clean/encoded/HealthInspectionsAll.csv"
+    # Debug: show only the non-zero features going into the model
     try:
-        df = pd.read_csv(path)
-    except Exception as e:
-        print("Error loading inspection history for /predict-inspector:", e)
-        _insp_history_df = pd.DataFrame()
-        return _insp_history_df
+        non_zero = {k: v for k, v in feats.items() if v != 0.0}
+        print("[DEBUG] /predict feature_vector_non_zero", non_zero)
+    except Exception:
+        pass
 
-    _insp_history_df = df
-    return _insp_history_df
-
+    return arr.reshape(1, -1)
 
 def _safe_series_float(row: pd.Series, col: str, default: float = 0.0) -> float:
     if col not in row.index:
@@ -213,118 +216,12 @@ def _safe_series_float(row: pd.Series, col: str, default: float = 0.0) -> float:
 
 
 def _clean_inspection_type_label(raw: str) -> str:
-    """Map UI inspection type text to the cleaned labels used in MODEL_FEATURES.
-
-    e.g. "Routine Inspection" -> "routine" so that
-    col = "inspection_type_clean_routine" exists.
-    """
-
     if raw is None:
         return "nan"
     s = str(raw).strip().lower()
     if s.endswith(" inspection"):
         s = s[: -len(" inspection")]
     return s or "nan"
-
-
-def build_numeric_prediction_for_inspector(
-    input_data: InspectorPredictionInput,
-) -> PredictionInput:
-
-    df = load_inspection_history_df()
-    if df.empty:
-        raise HTTPException(status_code=500, detail="Inspection history not available")
-
-    biz_df = df.copy()
-
-    # Prefer lookup by BusinessName_id if business_id is provided
-    if input_data.business_id is not None:
-        if "BusinessName_id" not in biz_df.columns:
-            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName_id column")
-        biz_df = biz_df[biz_df["BusinessName_id"] == input_data.business_id]
-    else:
-        # Fallback: lookup by BusinessName string
-        if "BusinessName" not in biz_df.columns:
-            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName column")
-
-        if not input_data.business_name:
-            raise HTTPException(status_code=400, detail="Business name or id is required")
-
-        key = input_data.business_name.strip().upper()
-        biz_df["_name_key"] = biz_df["BusinessName"].astype(str).str.strip().str.upper()
-        biz_df = biz_df[biz_df["_name_key"] == key]
-
-    if biz_df.empty:
-        raise HTTPException(status_code=404, detail="No inspection history found for this business")
-
-    # Build an inspection datetime for each historical record
-    required_date_cols = {"insp_year", "insp_month", "insp_day"}
-    if not required_date_cols.issubset(biz_df.columns):
-        raise HTTPException(status_code=500, detail="Inspection history missing insp_year/month/day columns")
-
-    biz_df = biz_df.copy()
-    biz_df["_insp_datetime"] = pd.to_datetime(
-        dict(
-            year=biz_df["insp_year"],
-            month=biz_df["insp_month"],
-            day=biz_df["insp_day"],
-        ),
-        errors="coerce",
-    )
-    biz_df = biz_df.dropna(subset=["_insp_datetime"])
-    if biz_df.empty:
-        raise HTTPException(status_code=404, detail="No dated inspections found for this business")
-
-    target_ts = pd.Timestamp(input_data.inspection_date)
-    hist = biz_df[biz_df["_insp_datetime"] < target_ts].sort_values("_insp_datetime")
-
-    if hist.empty:
-        # If there is no prior inspection before the chosen date, fall back to the
-        # latest known inspection for this business.
-        last_row = biz_df.sort_values("_insp_datetime").iloc[-1]
-    else:
-        last_row = hist.iloc[-1]
-
-    # Core numeric features inferred from the latest known inspection
-    latitude = _safe_series_float(last_row, "latitude", 0.0)
-    longitude = _safe_series_float(last_row, "longitude", 0.0)
-    avg_viol_last_3 = _safe_series_float(last_row, "avg_violations_last_3", 0.0)
-    fail_rate_last_3 = _safe_series_float(last_row, "fail_rate_last_3", 0.0)
-    trend_last_3 = _safe_series_float(last_row, "trend_last_3", 0.0)
-
-    # Days since last inspection: difference between requested date and last known inspection
-    last_insp_ts = last_row["_insp_datetime"]
-    days_since_last = max(0, int((target_ts - last_insp_ts).days))
-
-    # Date‑based features for the *new* inspection
-    insp_year = int(input_data.inspection_date.year)
-    insp_month = int(input_data.inspection_date.month)
-    insp_day = int(input_data.inspection_date.day)
-
-    # Convert Python weekday (Mon=0..Sun=6) to 0=Sun..6=Sat to stay
-    # consistent with how the UI labels days of week.
-    dow_py = input_data.inspection_date.weekday()
-    insp_dow = (dow_py + 1) % 7
-
-    clean_type = _clean_inspection_type_label(input_data.inspection_type)
-
-    return PredictionInput(
-        latitude=latitude,
-        longitude=longitude,
-        avg_violations_last_3=avg_viol_last_3,
-        fail_rate_last_3=fail_rate_last_3,
-        days_since_last_inspection=days_since_last,
-        trend_last_3=trend_last_3,
-        insp_year=insp_year,
-        insp_month=insp_month,
-        insp_day=insp_day,
-        insp_dow=insp_dow,
-        # We currently do not recompute insp_days_since_ref; the
-        # model has been operating with 0 here from the UI, so we
-        # keep that behaviour.
-        insp_days_since_ref=0,
-        inspection_type=clean_type,
-    )
 
 @app.get("/test-model")
 def test_model():
@@ -338,55 +235,544 @@ def test_model():
         return {"ok": False, "error": str(e)}
 
 
-@app.post("/predict", response_model=PredictionOutput)
-def predict(input_data: PredictionInput):
-    # print("Received? input:", input_data)
-    X = make_features(input_data)
-    print("Constructed features:", X)
-    proba = float(model.predict_proba(X)[0,1])  # adjust if not binary
-    print(proba)
-    # p_fail = float(model.predict_proba(X)[0, 1])  # assuming classes_ == [0,1] and 1 == fail
-    y_hat = int(model.predict(X)[0])
-    # print(type(raw_obj), getattr(raw_obj, "keys", lambda: None)())
+def _load_multiclass_model_and_scaler():
+    """Lazy-load the multiclass XGBoost model and its scaler."""
 
-    # <0.4 = LOW, 0.4–0.7 = MEDIUM, >0.7 = HIGH.
-    if proba > 0.7:
-        label = "HIGH"
-    elif proba >= 0.4:
-        label = "MEDIUM"
-    else:
-        label = "LOW"
-    outcome_text = "FAIL" if y_hat == 1 else "PASS"
-    return PredictionOutput(risk_label=label, risk_score=proba,outcome_label=y_hat,outcome_text=outcome_text,)
+    global _xgb_multiclass_model, _xgb_multiclass_scaler
+
+    if _xgb_multiclass_model is None:
+        obj = joblib.load(XGB_MULTICLASS_MODEL_PATH)
+        # Notebook saved the bare estimator via joblib.dump(xgb_tuned, ...)
+        if isinstance(obj, dict) and "model" in obj:
+            _xgb_multiclass_model = obj["model"]
+        else:
+            _xgb_multiclass_model = obj
+
+    if _xgb_multiclass_scaler is None:
+        _xgb_multiclass_scaler = joblib.load(MULTICLASS_SCALER_PATH)
+
+    return _xgb_multiclass_model, _xgb_multiclass_scaler
 
 
-@app.post("/predict-inspector", response_model=PredictionOutput)
-def predict_inspector(input_data: InspectorPredictionInput):
-    """Inspector‑focused prediction.
+def _load_model_dataset_df() -> pd.DataFrame:
+    """Lazy-load the multiclass training dataset used to fit the model.
 
-    Frontend sends only business name, inspection type, and target date.
-    Backend reconstructs all engineered features from historical data.
+    This is only for debugging / sanity checks (e.g., inspecting
+    how the trained model scores rows that are true FAILs).
     """
+    global _model_dataset_cache
 
-    numeric_input = build_numeric_prediction_for_inspector(input_data)
-    X = make_features(numeric_input)
-    proba = float(model.predict_proba(X)[0, 1])
-    y_hat = int(model.predict(X)[0])
+    if _model_dataset_cache is not None:
+        return _model_dataset_cache
 
-    if proba > 0.7:
+    try:
+        df = pd.read_csv(MULTICLASS_DATASET_PATH)
+    except Exception as exc:
+        print("Error loading model_dataset.csv", exc)
+        df = pd.DataFrame()
+
+    _model_dataset_cache = df
+    return _model_dataset_cache
+
+
+def _build_multiclass_features_from_visualization(payload: PredictRequest) -> np.ndarray:
+    """Construct model_dataset-style features from Visualization_HealthInspections.
+
+    Steps:
+    - Find the matching business row in the visualization CSV (latest inspection).
+    - Pull violation_count, prev_rating_majority_3, avg_violations, etc.
+    - Recompute days_since_last_inspection from the last inspection date to the
+      target inspection_date provided by the frontend.
+    - One-hot encode analysis_neighborhood and inspection_type into MODEL_FEATURES.
+    """
+    df = _load_neighborhood_feature_df()
+    if df is None or df.empty:
+        raise HTTPException(status_code=500, detail="Visualization dataset not available")
+
+    if "inspection_date" not in df.columns:
+        raise HTTPException(status_code=500, detail="inspection_date column missing in visualization dataset")
+
+    name_key = _normalize_name(payload.business_name)
+
+    # analysis_neighborhood from the frontend is a one-hot feature name like
+    # "analysis_neighborhood_Mission"; convert it back to the raw label
+    raw_neigh_from_input = str(payload.analysis_neighborhood or "").strip()
+    if raw_neigh_from_input.startswith("analysis_neighborhood_"):
+        raw_neigh_label = raw_neigh_from_input[len("analysis_neighborhood_") :]
+    else:
+        raw_neigh_label = raw_neigh_from_input
+    neigh_key = raw_neigh_label.strip().lower()
+
+    subset = df[(df["name_key"] == name_key) & (df["neighborhood_key"] == neigh_key)]
+    if subset.empty:
+        subset = df[df["name_key"] == name_key]
+
+    if subset.empty:
+        raise HTTPException(status_code=404, detail="Business not found in visualization dataset")
+
+    # Debug: show how many matches we found
+    try:
+        print(
+            "[DEBUG] /predict lookup",
+            {
+                "business_name": payload.business_name,
+                "analysis_neighborhood_input": payload.analysis_neighborhood,
+                "name_key": name_key,
+                "neigh_key": neigh_key,
+                "matched_rows": int(len(subset)),
+            },
+        )
+    except Exception:
+        pass
+
+    subset = subset.copy()
+    subset["inspection_date_parsed"] = pd.to_datetime(subset["inspection_date"], errors="coerce")
+    subset = subset.dropna(subset=["inspection_date_parsed"])
+    if subset.empty:
+        raise HTTPException(status_code=500, detail="No valid inspection dates for this business")
+
+    # Take the latest inspection by date as the reference record
+    ref_row = subset.sort_values("inspection_date_parsed").iloc[-1]
+    last_insp_date = ref_row["inspection_date_parsed"].date()
+    target_date = payload.inspection_date
+
+    days_since_last = max((target_date - last_insp_date).days, 0)
+
+    # Scalar features for the *current* inspection violations.
+    # By default, if the inspector does not provide a violation_count,
+    # we assume 0 violations for this inspection and has_violation_count = 0,
+    # instead of using the historical violation_count from the dataset.
+    violation_count = 0.0
+    has_violation_count = 0
+
+    # If the inspector provides a current violation_count in the request,
+    # use that value and derive has_violation_count from it.
+    if payload.violation_count is not None:
+        try:
+            violation_count = float(payload.violation_count)
+            has_violation_count = 1 if violation_count > 0 else 0
+        except Exception:
+            # If parsing fails, keep the default 0/0
+            violation_count = 0.0
+            has_violation_count = 0
+    prev_rating_majority_3 = _safe_series_float(ref_row, "prev_rating_majority_3", default=0.0)
+    avg_viol_last_3 = _safe_series_float(ref_row, "avg_violation_count_last_3", default=0.0)
+    is_first_inspection = int(_safe_series_float(ref_row, "is_first_inspection", default=0.0))
+
+    # One-hot neighborhood column name should align with frontend-selected analysis_neighborhood
+    raw_neigh = str(ref_row.get("analysis_neighborhood", "")).strip()
+    neigh_feature = payload.analysis_neighborhood
+
+    # Clean inspection type from UI into the short form used in MODEL_FEATURES
+    clean_type = _clean_inspection_type_label(payload.inspection_type)
+
+    numeric_input = PredictionInput(
+        violation_count=violation_count,
+        has_violation_count=has_violation_count,
+        prev_rating_majority_3=prev_rating_majority_3,
+        days_since_last_inspection=float(days_since_last),
+        avg_violation_count_last_3=avg_viol_last_3,
+        is_first_inspection=is_first_inspection,
+        analysis_neighborhood=neigh_feature,
+        inspection_type=clean_type,
+    )
+
+    # Debug: show the scalar inputs and categorical labels used to build features
+    try:
+        print(
+            "[DEBUG] /predict numeric_input",
+            {
+                **numeric_input.dict(),
+                "raw_neighborhood_csv": raw_neigh,
+                "neigh_feature_used": neigh_feature,
+            },
+        )
+    except Exception:
+        pass
+
+    return make_features(numeric_input)
+
+
+@app.post("/predict", response_model=PredictionOutput)
+def predict(payload: PredictRequest):
+    xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
+
+    X_raw = _build_multiclass_features_from_visualization(payload)
+    # print("Raw features:", X_raw)
+    X_scaled = scaler_mc.transform(X_raw)
+
+    proba_all = xgb_model.predict_proba(X_scaled)[0]
+    classes = getattr(xgb_model, "classes_", np.array([0, 1, 2]))
+
+    # Probability of FAIL (class 2) for risk banding
+    fail_index = None
+    try:
+        idx = np.where(classes == 2)[0]
+        if len(idx) > 0:
+            fail_index = int(idx[0])
+    except Exception:
+        fail_index = None
+    if fail_index is None:
+        fail_index = proba_all.shape[0] - 1
+
+    # Map full probability vector into class-wise values
+    # Assume classes are 0, 1, 2 = Pass, Conditional Pass, Fail
+    def _get_proba_for_class(cls_id: int) -> float:
+        try:
+            idx_arr = np.where(classes == cls_id)[0]
+            if len(idx_arr) == 0:
+                return 0.0
+            return float(proba_all[int(idx_arr[0])])
+        except Exception:
+            return 0.0
+
+    p_pass = _get_proba_for_class(0)
+    p_conditional = _get_proba_for_class(1)
+    p_fail = _get_proba_for_class(2)
+
+    y_hat = int(xgb_model.predict(X_scaled)[0])
+
+    # Map probability to LOW / MEDIUM / HIGH as before
+    if p_fail > 0.7:
         label = "HIGH"
-    elif proba >= 0.4:
+    elif p_fail >= 0.4:
         label = "MEDIUM"
     else:
         label = "LOW"
 
-    outcome_text = "FAIL" if y_hat == 1 else "PASS"
+    # Binary outcome for UI: FAIL if predicted class == 2, else PASS
+    outcome_binary = 1 if y_hat == 2 else 0
+    if y_hat == 0:
+        predicted_label = "Pass"
+    elif y_hat == 1:
+        predicted_label = "Conditional Pass"
+    elif y_hat == 2:
+        predicted_label = "Fail"
+    else:
+        predicted_label = "Unknown"
+
+    outcome_text = "FAIL" if outcome_binary == 1 else "PASS"
+
     return PredictionOutput(
         risk_label=label,
-        risk_score=proba,
-        outcome_label=y_hat,
+        risk_score=p_fail,
+        outcome_label=outcome_binary,
         outcome_text=outcome_text,
+        proba_pass=p_pass,
+        proba_conditional=p_conditional,
+        proba_fail=p_fail,
+        predicted_class_label=predicted_label,
     )
+
+
+@app.get("/debug-fail-samples")
+def debug_fail_samples(limit: int = 5):
+    """Inspect how the multiclass model scores true FAIL rows from the training set.
+
+    A FAIL is indicated by facility_rating_status == 2 in model_dataset.csv.
+    This endpoint returns a small sample of such rows with the model's
+    predicted probabilities for classes 0, 1, 2.
+    """
+
+    xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
+    df = _load_model_dataset_df()
+
+    if df is None or df.empty:
+        raise HTTPException(status_code=500, detail="model_dataset.csv not available")
+
+    if "facility_rating_status" not in df.columns:
+        raise HTTPException(status_code=500, detail="facility_rating_status column missing in model_dataset.csv")
+
+    # True FAIL rows from the training dataset
+    fail_df = df[df["facility_rating_status"] == 2].copy()
+    if fail_df.empty:
+        raise HTTPException(status_code=500, detail="No FAIL rows (status=2) found in model_dataset.csv")
+
+    fail_df = fail_df.reset_index().rename(columns={"index": "row_index"})
+    fail_df = fail_df.head(max(1, int(limit)))
+
+    # MODEL_FEATURES are exactly the columns used during training
+    missing_feats = [c for c in MODEL_FEATURES if c not in fail_df.columns]
+    if missing_feats:
+        raise HTTPException(
+            status_code=500,
+            detail=f"model_dataset.csv missing expected feature columns: {missing_feats}",
+        )
+
+    X = fail_df[MODEL_FEATURES].values.astype(float)
+    y_true = fail_df["facility_rating_status"].astype(int).values
+
+    X_scaled = scaler_mc.transform(X)
+    proba_all = xgb_model.predict_proba(X_scaled)
+    y_pred = xgb_model.predict(X_scaled).astype(int)
+
+    classes = getattr(xgb_model, "classes_", np.array([0, 1, 2]))
+
+    def _proba_for(sample_idx: int, cls_id: int) -> float:
+        try:
+            idx_arr = np.where(classes == cls_id)[0]
+            if len(idx_arr) == 0:
+                return 0.0
+            return float(proba_all[sample_idx, int(idx_arr[0])])
+        except Exception:
+            return 0.0
+
+    results = []
+    for i in range(len(fail_df)):
+        row = fail_df.iloc[i]
+        results.append(
+            {
+                "row_index": int(row["row_index"]),
+                "true_label": int(y_true[i]),  # should be 2 (FAIL)
+                "proba_pass": _proba_for(i, 0),
+                "proba_conditional": _proba_for(i, 1),
+                "proba_fail": _proba_for(i, 2),
+                "predicted_label": int(y_pred[i]),
+            }
+        )
+
+    return {"samples": results, "classes": classes.tolist()}
+
+
+@app.get("/debug-fail-input-examples")
+def debug_fail_input_examples(
+    limit: int = 5,
+    threshold: float = 0.7,
+    violation_count: Optional[float] = None,
+    inspection_date: Optional[date] = None,
+):
+    """Find concrete business inputs that the live pipeline predicts as FAIL.
+
+    This uses Visualization_HealthInspections + the same feature construction
+    as /predict to locate (business, neighborhood, date, type) combos where
+    the multiclass model predicts class 2 (FAIL) with proba_fail >= threshold.
+
+    If a violation_count query parameter is provided, it is passed through to
+    /predict as the current inspection's violation_count, so you can see which
+    combinations would be flagged as FAIL for that level of violations.
+
+    If an inspection_date query parameter is provided (YYYY-MM-DD), it is used
+    as the inspection date seen by the model; otherwise the latest historical
+    inspection date from the dataset is used.
+
+    The response gives you values you can plug directly into the frontend
+    form (business_name, analysis_neighborhood, inspection_type, inspection_date).
+    """
+
+    xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
+    df = _load_neighborhood_feature_df()
+
+    if df is None or df.empty:
+        raise HTTPException(status_code=500, detail="Visualization dataset not available")
+
+    if "inspection_date" not in df.columns:
+        raise HTTPException(status_code=500, detail="inspection_date column missing in visualization dataset")
+
+    tmp = df.copy()
+    tmp["inspection_date_parsed"] = pd.to_datetime(tmp["inspection_date"], errors="coerce")
+    tmp = tmp.dropna(subset=["inspection_date_parsed"])
+
+    if "name_key" not in tmp.columns:
+        tmp["name_key"] = tmp["name"].apply(_normalize_name)
+    if "neighborhood_key" not in tmp.columns:
+        tmp["neighborhood_key"] = (
+            tmp["analysis_neighborhood"].astype(str).str.strip().str.lower()
+        )
+
+    # Latest inspection per (business, neighborhood)
+    latest_idx = tmp.groupby(["name_key", "neighborhood_key"]) ["inspection_date_parsed"].idxmax()
+    latest = tmp.loc[latest_idx].reset_index(drop=True)
+
+    classes = getattr(xgb_model, "classes_", np.array([0, 1, 2]))
+
+    def _proba_for(proba_vec: np.ndarray, cls_id: int) -> float:
+        try:
+            idx_arr = np.where(classes == cls_id)[0]
+            if len(idx_arr) == 0:
+                return 0.0
+            return float(proba_vec[int(idx_arr[0])])
+        except Exception:
+            return 0.0
+
+    examples = []
+
+    for _, row in latest.iterrows():
+        business_name = str(row.get("name", "")).strip()
+        neigh_label = str(row.get("analysis_neighborhood", "")).strip()
+        insp_dt_hist = row["inspection_date_parsed"].date()
+        insp_type_clean = str(row.get("inspection_type_clean", "routine") or "routine").strip().lower()
+
+        if not business_name or not neigh_label:
+            continue
+
+        analysis_neighborhood_feature = f"analysis_neighborhood_{neigh_label}"
+
+        # Target inspection date for the model: either the caller-provided
+        # inspection_date or the historical inspection date from the dataset.
+        target_dt = inspection_date or insp_dt_hist
+
+        payload = PredictRequest(
+            business_name=business_name,
+            inspection_type=insp_type_clean,
+            inspection_date=target_dt,
+            analysis_neighborhood=analysis_neighborhood_feature,
+            violation_count=violation_count,
+        )
+
+        try:
+            X_raw = _build_multiclass_features_from_visualization(payload)
+            X_scaled = scaler_mc.transform(X_raw)
+            proba_vec = xgb_model.predict_proba(X_scaled)[0]
+            y_hat = int(xgb_model.predict(X_scaled)[0])
+        except Exception:
+            continue
+
+        p_fail = _proba_for(proba_vec, 2)
+        p_pass = _proba_for(proba_vec, 0)
+        p_cond = _proba_for(proba_vec, 1)
+
+        if y_hat == 2 and p_fail >= float(threshold):
+            examples.append(
+                {
+                    "business_name": business_name,
+                    "analysis_neighborhood_input": analysis_neighborhood_feature,
+                    "analysis_neighborhood_label": neigh_label,
+                    "inspection_type_input": insp_type_clean,
+                    "inspection_date_input": target_dt.isoformat(),
+                    "violation_count_input": violation_count,
+                    "proba_pass": p_pass,
+                    "proba_conditional": p_cond,
+                    "proba_fail": p_fail,
+                    "predicted_label": y_hat,
+                }
+            )
+            if len(examples) >= max(1, int(limit)):
+                break
+
+    return {
+        "threshold": float(threshold),
+        "violation_count": violation_count,
+        "inspection_date": inspection_date.isoformat() if inspection_date else None,
+        "examples": examples,
+    }
+
+
+@app.get("/debug-conditional-input-examples")
+def debug_conditional_input_examples(
+    limit: int = 5,
+    threshold: float = 0.7,
+    violation_count: Optional[float] = None,
+    inspection_date: Optional[date] = None,
+):
+    """Find concrete business inputs that the live pipeline predicts as Conditional Pass.
+
+    Uses Visualization_HealthInspections + the same feature construction as /predict
+    to locate (business, neighborhood, date, type) combos where the multiclass
+    model predicts class 1 (Conditional Pass) with proba_conditional >= threshold.
+
+    If a violation_count query parameter is provided, it is passed through to
+    /predict as the current inspection's violation_count, so you can see which
+    combinations would be flagged as Conditional Pass for that level of violations.
+
+    If an inspection_date query parameter is provided (YYYY-MM-DD), it is used
+    as the inspection date seen by the model; otherwise the latest historical
+    inspection date from the dataset is used.
+    """
+
+    xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
+    df = _load_neighborhood_feature_df()
+
+    if df is None or df.empty:
+        raise HTTPException(status_code=500, detail="Visualization dataset not available")
+
+    if "inspection_date" not in df.columns:
+        raise HTTPException(status_code=500, detail="inspection_date column missing in visualization dataset")
+
+    tmp = df.copy()
+    tmp["inspection_date_parsed"] = pd.to_datetime(tmp["inspection_date"], errors="coerce")
+    tmp = tmp.dropna(subset=["inspection_date_parsed"])
+
+    if "name_key" not in tmp.columns:
+        tmp["name_key"] = tmp["name"].apply(_normalize_name)
+    if "neighborhood_key" not in tmp.columns:
+        tmp["neighborhood_key"] = (
+            tmp["analysis_neighborhood"].astype(str).str.strip().str.lower()
+        )
+
+    latest_idx = tmp.groupby(["name_key", "neighborhood_key"]) ["inspection_date_parsed"].idxmax()
+    latest = tmp.loc[latest_idx].reset_index(drop=True)
+
+    classes = getattr(xgb_model, "classes_", np.array([0, 1, 2]))
+
+    def _proba_for(proba_vec: np.ndarray, cls_id: int) -> float:
+        try:
+            idx_arr = np.where(classes == cls_id)[0]
+            if len(idx_arr) == 0:
+                return 0.0
+            return float(proba_vec[int(idx_arr[0])])
+        except Exception:
+            return 0.0
+
+    examples = []
+
+    for _, row in latest.iterrows():
+        business_name = str(row.get("name", "")).strip()
+        neigh_label = str(row.get("analysis_neighborhood", "")).strip()
+        insp_dt_hist = row["inspection_date_parsed"].date()
+        insp_type_clean = str(row.get("inspection_type_clean", "routine") or "routine").strip().lower()
+
+        if not business_name or not neigh_label:
+            continue
+
+        analysis_neighborhood_feature = f"analysis_neighborhood_{neigh_label}"
+
+        # Target inspection date as seen by the model
+        target_dt = inspection_date or insp_dt_hist
+
+        payload = PredictRequest(
+            business_name=business_name,
+            inspection_type=insp_type_clean,
+            inspection_date=target_dt,
+            analysis_neighborhood=analysis_neighborhood_feature,
+            violation_count=violation_count,
+        )
+
+        try:
+            X_raw = _build_multiclass_features_from_visualization(payload)
+            X_scaled = scaler_mc.transform(X_raw)
+            proba_vec = xgb_model.predict_proba(X_scaled)[0]
+            y_hat = int(xgb_model.predict(X_scaled)[0])
+        except Exception:
+            continue
+
+        p_fail = _proba_for(proba_vec, 2)
+        p_pass = _proba_for(proba_vec, 0)
+        p_cond = _proba_for(proba_vec, 1)
+
+        if y_hat == 1 and p_cond >= float(threshold):
+            examples.append(
+                {
+                    "business_name": business_name,
+                    "analysis_neighborhood_input": analysis_neighborhood_feature,
+                    "analysis_neighborhood_label": neigh_label,
+                    "inspection_type_input": insp_type_clean,
+                    "inspection_date_input": target_dt.isoformat(),
+                    "violation_count_input": violation_count,
+                    "proba_pass": p_pass,
+                    "proba_conditional": p_cond,
+                    "proba_fail": p_fail,
+                    "predicted_label": y_hat,
+                }
+            )
+            if len(examples) >= max(1, int(limit)):
+                break
+
+    return {
+        "threshold": float(threshold),
+        "violation_count": violation_count,
+        "inspection_date": inspection_date.isoformat() if inspection_date else None,
+        "examples": examples,
+    }
 def safe_float(x):
     # convert to 0.0 
     if x is None:
@@ -591,116 +977,45 @@ def _load_neighborhood_feature_df() -> pd.DataFrame:
 
 @app.get("/data-insights")
 def data_insights():
-    X_val = raw_obj.get("X_val")
-    y_val = raw_obj.get("y_val")
-    scaler = raw_obj.get("scaler")
-    feature_names = raw_obj.get("feature_names")
+    """Model insight dashboard backed only by a saved metrics .pkl.
 
-    if X_val is None or y_val is None:
-        return {"error": "X_val / y_val not in model package"}
+    For now we do **not** load any datasets or additional models.
+    We simply expose the weighted ROC-AUC (and a few basic counts)
+    from the metrics dictionary stored in METRICS_PKL_PATH.
+    """
 
-    Xv = scaler.transform(X_val) if scaler is not None else X_val
-    proba = model.predict_proba(Xv)[:, 1]
-    y_pred = model.predict(Xv)
+    try:
+        metrics = joblib.load(METRICS_PKL_PATH)
+    except Exception as exc:
+        return {"error": f"Unable to load metrics file: {exc}"}
 
-    # AUC, ROC
-    auc = safe_float(roc_auc_score(y_val, proba))
-    fpr, tpr, thresholds = roc_curve(y_val, proba)
-    roc_curve_payload = {
-        "fpr": [safe_float(v) for v in fpr],
-        "tpr": [safe_float(v) for v in tpr],
-        "thresholds": [safe_float(v) for v in thresholds],
-    }
+    # Prefer weighted ROC-AUC if available
+    weighted_auc = metrics.get("roc_auc_weighted")
+    try:
+        roc_auc = float(weighted_auc) if weighted_auc is not None else None
+    except Exception:
+        roc_auc = None
 
-    # classification report, clean NaNs
-    report_raw = classification_report(y_val, y_pred, output_dict=True)
-    clean_report = {}
-    for key, val in report_raw.items():
-        if isinstance(val, dict):
-            clean_report[key] = {k: safe_float(v) for k, v in val.items()}
-        else:
-            clean_report[key] = safe_float(val)
-
-    recall_fail = safe_float(report_raw["1"]["recall"])
-
-    # feature importance
-    importances = getattr(model, "feature_importances_", None)
-    if importances is not None and feature_names is not None:
-        # Aggregate one-hot inspection_type_clean_* columns into a single
-        # logical feature so they don't dominate the top-importance list.
-        agg_importance = {}
-        n_inspection_type_feats = 0
-        for f, i in zip(feature_names, importances):
-            imp_val = safe_float(i)
-            if f.startswith("inspection_type_clean"):
-                key = "inspection_type"
-                n_inspection_type_feats += 1
-            else:
-                key = f
-            agg_importance[key] = agg_importance.get(key, 0.0) + (imp_val or 0.0)
-
-        # Optionally scale the aggregated inspection_type importance
-        # so that it's comparable to a single feature instead of the
-        # sum over all one-hot columns (similar to dividing by 10).
-        if "inspection_type" in agg_importance and n_inspection_type_feats > 0:
-            agg_importance["inspection_type"] /= float(n_inspection_type_feats)
-
-        feat_imp = [
-            {"feature": f, "importance": safe_float(imp)}
-            for f, imp in sorted(
-                agg_importance.items(),
-                key=lambda x: x[1],
-                reverse=True,
-            )
-        ]
-    else:
-        feat_imp = None
-
-    # correlations
-    corr_features = [
-        "failFlag",
-        "avg_violations_last_3",
-        "fail_rate_last_3",
-        "days_since_last_inspection",
-        "trend_last_3",
-    ]
-    df_val = pd.concat(
-        [X_val[corr_features[1:]], y_val.rename("failFlag")], axis=1
-    )
-    corr = df_val.corr()
-    corr_matrix = {
-        "features": corr.columns.tolist(),
-        "values": [[safe_float(v) for v in row] for row in corr.values],
-    }
-
-    # fail rate by year
-    if "insp_year" in X_val.columns:
-        df_year = pd.concat(
-            [X_val["insp_year"], y_val.rename("failFlag")], axis=1
-        )
-        grouped = (
-            df_year.groupby("insp_year")["failFlag"]
-            .mean()
-            .reset_index()
-            .rename(columns={"failFlag": "fail_rate"})
-        )
-        fail_rate_year = [
-            {"year": int(r["insp_year"]), "rate": safe_float(r["fail_rate"])}
-            for _, r in grouped.iterrows()
-        ]
-    else:
-        fail_rate_year = []
+    # Basic sizes if present in the metrics
+    total_records = int(metrics.get("val_size") or 0)
+    n_features = int(metrics.get("n_features") or 0)
 
     return {
-        "roc_auc": auc,
-        "recall_fail": recall_fail,
-        "total_records": int(len(X_val) + len(y_val)),
-        "n_features": len(feature_names) if feature_names is not None else None,
-        "roc_curve": roc_curve_payload,
-        "classification_report": clean_report,
-        "feature_importance": feat_imp,
-        "correlations": corr_matrix,
-        "fail_rate_by_year": fail_rate_year,
+        "total_records": total_records,
+        # No per-model comparison for now
+        "models": [],
+        # ROC curves are not derived from the metrics file at this stage
+        "roc_curves": None,
+        # Leave correlations and fail-rate charts empty for now
+        "correlations": {"features": [], "values": []},
+        "fail_rate_by_year": [],
+        # Primary metric exposed for the frontend dashboard
+        "roc_auc": roc_auc,
+        "recall_fail": None,
+        "n_features": n_features,
+        # If a classification report was saved, pass it through
+        "classification_report": metrics.get("classification_report"),
+        "feature_importance": None,
     }
 import pandas as pd
 
