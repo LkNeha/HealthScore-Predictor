@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "intergration/uidevelopment"]
+	url = https://github.com/LkNeha/HealthScore-Predictor.git
+	fetch = +refs/heads/*:refs/remotes/intergration/uidevelopment/*
+[branch "intergration/frontenddevelopment"]
+	remote = intergration/uidevelopment
+	merge = refs/heads/intergration/frontenddevelopment
+	vscode-merge-base = intergration/uidevelopment/main

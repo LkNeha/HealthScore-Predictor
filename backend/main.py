@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
@@ -8,9 +8,11 @@ from sklearn.metrics import roc_auc_score, roc_curve, classification_report, con
 import math
 import numpy as np
 import pandas as pd
+from datetime import date
+from typing import Optional
 app = FastAPI()
 
-# ---- CORS so React (localhost:3000) can call this ----
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -19,11 +21,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---- load model once ----
+# subset["fail_flag"] = (
+#         subset.get("facility_rating_status_y").fillna(1) <= 0
+#     ).astype(int)
+
 # MODEL_PATH = Path(__file__).parent / "model" / "xgboost_tuned_scaleweight.pkl"
 MODEL_PATH='C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
 raw_obj = joblib.load(MODEL_PATH)
-# if you know you saved {"model": xgb_model, ...}
+_customer_join_cache = None
+_neighborhood_feature_df = None
+_google_clean_cache = None
+
+NEIGHBORHOOD_SOURCE_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/Visualization_HealthInspections.csv"
+GOOGLE_CLEAN_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/google_cleaned.csv"
+TOP_SCORE_THRESHOLD = 3000
+MIN_INSPECTION_DATE = pd.Timestamp("2023-01-01")
+
+
 if isinstance(raw_obj, dict) and "model" in raw_obj:
     model = raw_obj["model"]
     scaler = raw_obj.get("scaler", None)
@@ -37,100 +51,280 @@ else:
     X_val = None
     y_val = None
 
-# ---- feature order expected by model ----
+#input features used by the model
 MODEL_FEATURES = [
-    "latitude",
-    "longitude",
-    "avg_violations_last_3",
-    "fail_rate_last_3",
+    "facility_rating_status",
+    "violation_count",
+    "has_violation_count",
+    "prev_rating_majority_3",
     "days_since_last_inspection",
-    "trend_last_3",
-    "BusinessName_id",
-    "Address_id",
-    "insp_year",
-    "insp_month",
-    "insp_day",
-    "insp_dow",
-    "insp_days_since_ref",
-    "inspection_type_clean_change of ownership",
+    "avg_violation_count_last_3",
+    "is_first_inspection",
+    "analysis_neighborhood_Bernal Heights",
+    "analysis_neighborhood_Castro/Upper Market",
+    "analysis_neighborhood_Chinatown",
+    "analysis_neighborhood_Excelsior",
+    "analysis_neighborhood_Financial District/South Beach",
+    "analysis_neighborhood_Glen Park",
+    "analysis_neighborhood_Golden Gate Park",
+    "analysis_neighborhood_Haight Ashbury",
+    "analysis_neighborhood_Hayes Valley",
+    "analysis_neighborhood_Inner Richmond",
+    "analysis_neighborhood_Inner Sunset",
+    "analysis_neighborhood_Japantown",
+    "analysis_neighborhood_Lakeshore",
+    "analysis_neighborhood_Lincoln Park",
+    "analysis_neighborhood_Lone Mountain/USF",
+    "analysis_neighborhood_Marina",
+    "analysis_neighborhood_McLaren Park",
+    "analysis_neighborhood_Mission",
+    "analysis_neighborhood_Mission Bay",
+    "analysis_neighborhood_Nob Hill",
+    "analysis_neighborhood_Noe Valley",
+    "analysis_neighborhood_North Beach",
+    "analysis_neighborhood_Oceanview/Merced/Ingleside",
+    "analysis_neighborhood_Outer Mission",
+    "analysis_neighborhood_Outer Richmond",
+    "analysis_neighborhood_Pacific Heights",
+    "analysis_neighborhood_Portola",
+    "analysis_neighborhood_Potrero Hill",
+    "analysis_neighborhood_Presidio",
+    "analysis_neighborhood_Presidio Heights",
+    "analysis_neighborhood_Russian Hill",
+    "analysis_neighborhood_Seacliff",
+    "analysis_neighborhood_South of Market",
+    "analysis_neighborhood_Sunset/Parkside",
+    "analysis_neighborhood_Tenderloin",
+    "analysis_neighborhood_Treasure Island",
+    "analysis_neighborhood_Twin Peaks",
+    "analysis_neighborhood_Visitacion Valley",
+    "analysis_neighborhood_West of Twin Peaks",
+    "analysis_neighborhood_Western Addition",
     "inspection_type_clean_complaint",
-    "inspection_type_clean_complaint (i)",
-    "inspection_type_clean_complaint (r)",
-    "inspection_type_clean_complaint reinspection/follow-up",
-    "inspection_type_clean_foodborne illness",
-    "inspection_type_clean_foodborne illness investigation",
-    "inspection_type_clean_new construction",
-    "inspection_type_clean_new ownership",
-    "inspection_type_clean_new ownership (i)",
-    "inspection_type_clean_new ownership (r)",
-    "inspection_type_clean_new ownership - followup",
-    "inspection_type_clean_non-inspection site visit",
-    "inspection_type_clean_plan check",
-    "inspection_type_clean_plan check (i)",
-    "inspection_type_clean_plan check (r)",
+    "inspection_type_clean_complaint_reinspection",
+    "inspection_type_clean_foodborne_illness",
+    "inspection_type_clean_new_construction",
+    "inspection_type_clean_new_ownership",
+    "inspection_type_clean_new_ownership_followup",
+    "inspection_type_clean_plan_check",
+    "inspection_type_clean_plan_check_reinspection",
     "inspection_type_clean_reinspection",
-    "inspection_type_clean_reinspection/followup",
     "inspection_type_clean_routine",
-    "inspection_type_clean_site visit",
+    "inspection_type_clean_site_visit",
     "inspection_type_clean_structural",
-    "inspection_type_clean_structural inspection",
-    "inspection_type_clean_nan",
 ]
 
 INSPECTION_OHE_FEATURES = [
     f for f in MODEL_FEATURES if f.startswith("inspection_type_clean_")
 ]
 
-# ---- request / response models ----
+NEIGHBOURHOOD_OHE_FEATURES = [
+    f for f in MODEL_FEATURES if f.startswith("analysis_neighborhood_")
+]
+
+
+# from frontend (compact payload)
 class PredictionInput(BaseModel):
-    latitude: float
-    longitude: float
-    avg_violations_last_3: float
-    fail_rate_last_3: float
-    days_since_last_inspection: int
-    trend_last_3: float
-    insp_year: int
-    insp_month: int
-    insp_day: int
-    insp_dow: int
-    insp_days_since_ref: int
-    inspection_type: str   # e.g. "routine", "complaint", "plan check (i)"
+    facility_rating_status: float
+    violation_count: float
+    has_violation_count: int
+    prev_rating_majority_3: float
+    days_since_last_inspection: float
+    avg_violation_count_last_3: float
+    is_first_inspection: int
+    analysis_neighborhood: str
+    inspection_type: str
 
 
 class PredictionOutput(BaseModel):
+    # proba1: float
+    # proba0: float
     risk_label: str
     risk_score: float
     outcome_label: int    # 0 or 1
     outcome_text: str 
 
 
+class InspectorPredictionInput(BaseModel):
+    business_id: Optional[int] = None
+    business_name: Optional[str] = None
+    inspection_type: str
+    inspection_date: date
+
+
 def make_features(data: PredictionInput) -> np.ndarray:
+    # start with all zeros
     feats = {name: 0.0 for name in MODEL_FEATURES}
 
-    feats["latitude"] = data.latitude
-    feats["longitude"] = data.longitude
-    feats["avg_violations_last_3"] = data.avg_violations_last_3
-    feats["fail_rate_last_3"] = data.fail_rate_last_3
+    # scalar features
+    feats["facility_rating_status"] = float(data.facility_rating_status)
+    feats["violation_count"] = float(data.violation_count)
+    feats["has_violation_count"] = float(data.has_violation_count)
+    feats["prev_rating_majority_3"] = float(data.prev_rating_majority_3)
     feats["days_since_last_inspection"] = float(data.days_since_last_inspection)
-    feats["trend_last_3"] = data.trend_last_3
-    feats["insp_year"] = float(data.insp_year)
-    feats["insp_month"] = float(data.insp_month)
-    feats["insp_day"] = float(data.insp_day)
-    feats["insp_dow"] = float(data.insp_dow)
-    feats["insp_days_since_ref"] = float(data.insp_days_since_ref)
+    feats["avg_violation_count_last_3"] = float(data.avg_violation_count_last_3)
+    feats["is_first_inspection"] = float(data.is_first_inspection)
 
-    # IDs not provided by frontend
-    feats["BusinessName_id"] = 0.0
-    feats["Address_id"] = 0.0
+    # neighbourhood one-hot
+    if data.analysis_neighborhood:
+        neigh_col = data.analysis_neighborhood
+        if neigh_col in NEIGHBOURHOOD_OHE_FEATURES:
+            feats[neigh_col] = 1.0
 
+    # inspection type one-hot
     col = f"inspection_type_clean_{data.inspection_type}"
     if col in INSPECTION_OHE_FEATURES:
         feats[col] = 1.0
-    else:
-        feats["inspection_type_clean_nan"] = 1.0
 
     arr = np.array([feats[name] for name in MODEL_FEATURES], dtype=float)
     return arr.reshape(1, -1)
+
+
+_insp_history_df = None
+def load_inspection_history_df() -> pd.DataFrame:
+    """Load and cache the encoded inspection history used for inspector predictions."""
+
+    global _insp_history_df
+    if _insp_history_df is not None:
+        return _insp_history_df
+
+    path = "C:/Users/lkneh/HealthScore-Predictor/data/clean/encoded/HealthInspectionsAll.csv"
+    try:
+        df = pd.read_csv(path)
+    except Exception as e:
+        print("Error loading inspection history for /predict-inspector:", e)
+        _insp_history_df = pd.DataFrame()
+        return _insp_history_df
+
+    _insp_history_df = df
+    return _insp_history_df
+
+
+def _safe_series_float(row: pd.Series, col: str, default: float = 0.0) -> float:
+    if col not in row.index:
+        return default
+    val = row[col]
+    if pd.isna(val):
+        return default
+    try:
+        return float(val)
+    except Exception:
+        return default
+
+
+def _clean_inspection_type_label(raw: str) -> str:
+    """Map UI inspection type text to the cleaned labels used in MODEL_FEATURES.
+
+    e.g. "Routine Inspection" -> "routine" so that
+    col = "inspection_type_clean_routine" exists.
+    """
+
+    if raw is None:
+        return "nan"
+    s = str(raw).strip().lower()
+    if s.endswith(" inspection"):
+        s = s[: -len(" inspection")]
+    return s or "nan"
+
+
+def build_numeric_prediction_for_inspector(
+    input_data: InspectorPredictionInput,
+) -> PredictionInput:
+
+    df = load_inspection_history_df()
+    if df.empty:
+        raise HTTPException(status_code=500, detail="Inspection history not available")
+
+    biz_df = df.copy()
+
+    # Prefer lookup by BusinessName_id if business_id is provided
+    if input_data.business_id is not None:
+        if "BusinessName_id" not in biz_df.columns:
+            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName_id column")
+        biz_df = biz_df[biz_df["BusinessName_id"] == input_data.business_id]
+    else:
+        # Fallback: lookup by BusinessName string
+        if "BusinessName" not in biz_df.columns:
+            raise HTTPException(status_code=500, detail="Inspection history missing BusinessName column")
+
+        if not input_data.business_name:
+            raise HTTPException(status_code=400, detail="Business name or id is required")
+
+        key = input_data.business_name.strip().upper()
+        biz_df["_name_key"] = biz_df["BusinessName"].astype(str).str.strip().str.upper()
+        biz_df = biz_df[biz_df["_name_key"] == key]
+
+    if biz_df.empty:
+        raise HTTPException(status_code=404, detail="No inspection history found for this business")
+
+    # Build an inspection datetime for each historical record
+    required_date_cols = {"insp_year", "insp_month", "insp_day"}
+    if not required_date_cols.issubset(biz_df.columns):
+        raise HTTPException(status_code=500, detail="Inspection history missing insp_year/month/day columns")
+
+    biz_df = biz_df.copy()
+    biz_df["_insp_datetime"] = pd.to_datetime(
+        dict(
+            year=biz_df["insp_year"],
+            month=biz_df["insp_month"],
+            day=biz_df["insp_day"],
+        ),
+        errors="coerce",
+    )
+    biz_df = biz_df.dropna(subset=["_insp_datetime"])
+    if biz_df.empty:
+        raise HTTPException(status_code=404, detail="No dated inspections found for this business")
+
+    target_ts = pd.Timestamp(input_data.inspection_date)
+    hist = biz_df[biz_df["_insp_datetime"] < target_ts].sort_values("_insp_datetime")
+
+    if hist.empty:
+        # If there is no prior inspection before the chosen date, fall back to the
+        # latest known inspection for this business.
+        last_row = biz_df.sort_values("_insp_datetime").iloc[-1]
+    else:
+        last_row = hist.iloc[-1]
+
+    # Core numeric features inferred from the latest known inspection
+    latitude = _safe_series_float(last_row, "latitude", 0.0)
+    longitude = _safe_series_float(last_row, "longitude", 0.0)
+    avg_viol_last_3 = _safe_series_float(last_row, "avg_violations_last_3", 0.0)
+    fail_rate_last_3 = _safe_series_float(last_row, "fail_rate_last_3", 0.0)
+    trend_last_3 = _safe_series_float(last_row, "trend_last_3", 0.0)
+
+    # Days since last inspection: difference between requested date and last known inspection
+    last_insp_ts = last_row["_insp_datetime"]
+    days_since_last = max(0, int((target_ts - last_insp_ts).days))
+
+    # Date‑based features for the *new* inspection
+    insp_year = int(input_data.inspection_date.year)
+    insp_month = int(input_data.inspection_date.month)
+    insp_day = int(input_data.inspection_date.day)
+
+    # Convert Python weekday (Mon=0..Sun=6) to 0=Sun..6=Sat to stay
+    # consistent with how the UI labels days of week.
+    dow_py = input_data.inspection_date.weekday()
+    insp_dow = (dow_py + 1) % 7
+
+    clean_type = _clean_inspection_type_label(input_data.inspection_type)
+
+    return PredictionInput(
+        latitude=latitude,
+        longitude=longitude,
+        avg_violations_last_3=avg_viol_last_3,
+        fail_rate_last_3=fail_rate_last_3,
+        days_since_last_inspection=days_since_last,
+        trend_last_3=trend_last_3,
+        insp_year=insp_year,
+        insp_month=insp_month,
+        insp_day=insp_day,
+        insp_dow=insp_dow,
+        # We currently do not recompute insp_days_since_ref; the
+        # model has been operating with 0 here from the UI, so we
+        # keep that behaviour.
+        insp_days_since_ref=0,
+        inspection_type=clean_type,
+    )
 
 @app.get("/test-model")
 def test_model():
@@ -146,11 +340,14 @@ def test_model():
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(input_data: PredictionInput):
+    # print("Received? input:", input_data)
     X = make_features(input_data)
-    proba = float(model.predict_proba(X)[0, 1])  # adjust if not binary
-    p_fail = float(model.predict_proba(X)[0, 1])  # assuming classes_ == [0,1] and 1 == fail
+    print("Constructed features:", X)
+    proba = float(model.predict_proba(X)[0,1])  # adjust if not binary
+    print(proba)
+    # p_fail = float(model.predict_proba(X)[0, 1])  # assuming classes_ == [0,1] and 1 == fail
     y_hat = int(model.predict(X)[0])
-    print(type(raw_obj), getattr(raw_obj, "keys", lambda: None)())
+    # print(type(raw_obj), getattr(raw_obj, "keys", lambda: None)())
 
     # <0.4 = LOW, 0.4–0.7 = MEDIUM, >0.7 = HIGH.
     if proba > 0.7:
@@ -161,6 +358,35 @@ def predict(input_data: PredictionInput):
         label = "LOW"
     outcome_text = "FAIL" if y_hat == 1 else "PASS"
     return PredictionOutput(risk_label=label, risk_score=proba,outcome_label=y_hat,outcome_text=outcome_text,)
+
+
+@app.post("/predict-inspector", response_model=PredictionOutput)
+def predict_inspector(input_data: InspectorPredictionInput):
+    """Inspector‑focused prediction.
+
+    Frontend sends only business name, inspection type, and target date.
+    Backend reconstructs all engineered features from historical data.
+    """
+
+    numeric_input = build_numeric_prediction_for_inspector(input_data)
+    X = make_features(numeric_input)
+    proba = float(model.predict_proba(X)[0, 1])
+    y_hat = int(model.predict(X)[0])
+
+    if proba > 0.7:
+        label = "HIGH"
+    elif proba >= 0.4:
+        label = "MEDIUM"
+    else:
+        label = "LOW"
+
+    outcome_text = "FAIL" if y_hat == 1 else "PASS"
+    return PredictionOutput(
+        risk_label=label,
+        risk_score=proba,
+        outcome_label=y_hat,
+        outcome_text=outcome_text,
+    )
 def safe_float(x):
     # convert to 0.0 
     if x is None:
@@ -199,87 +425,169 @@ def to_native(val):
     return val
 
 
-# ---------- Customer view helpers (join inspections with Google Places) ----------
-_customer_join_cache = None
 
 
 def load_customer_join_df():
-    """Join encoded inspections with Google Places export on name + lat/lon.
-
-    Cached in memory for fast customer lookups.
-    """
     global _customer_join_cache
     if _customer_join_cache is not None:
         return _customer_join_cache
 
-    # paths mirror those used elsewhere in this project
-    insp_path = "C:/Users/lkneh/HealthScore-Predictor/data/clean/encoded/HealthInspectionsAll.csv"
-    google_path = "C:/Users/lkneh/HealthScore-Predictor/data/raw/sf_restaurants_google.csv"
-
-    try:
-        insp = pd.read_csv(insp_path)
-        google = pd.read_csv(google_path)
-    except Exception as e:
-        print("Error loading customer join sources", e)
+    base_df = _load_neighborhood_feature_df() #loades vis_data with cleanes analysis and name field
+    if base_df is None or base_df.empty:
         _customer_join_cache = pd.DataFrame()
         return _customer_join_cache
 
-    # normalise join keys
-    insp = insp.copy()
-    google = google.copy()
-
-    insp["name_key"] = insp["BusinessName"].astype(str).str.strip().str.upper()
-    google["name_key"] = google["name"].astype(str).str.strip().str.upper()
-
-    # Join primarily on business name key; lat/lon are kept for reference but
-    # not required to match exactly (geocoding often differs slightly).
-    merged = pd.merge(
-        insp,
-        google,
-        on=["name_key"],
-        how="inner",
-    )
-
-    if merged.empty:
-        _customer_join_cache = merged
-        return _customer_join_cache
-
-    # Group by business identity (name/address/rating) and aggregate
-    # inspections, then compute a representative lat/lon.
-    group_cols = [
-        "name_key",
-        "BusinessName",
-        "address",  # from Google CSV
-        "rating",
-        "user_ratings_total",
-    ]
-
-    agg = (
-        merged.groupby(group_cols)
+    df = base_df.copy()
+    df["name_key"] = df["name"].apply(_normalize_name)
+    df = df[df["name_key"] != ""]
+    # df.to_csv("customer_join_base_debug.csv", index=False)
+    df["violation_count"] = pd.to_numeric(df.get("violation_count"), errors="coerce")
+    df["facility_rating_status"] = pd.to_numeric(df.get("facility_rating_status"), errors="coerce")
+    df["inspection_dt"] = pd.to_datetime(df.get("inspection_date"), errors="coerce")
+    ratings = df["facility_rating_status"].fillna(1)
+    df["fail_flag"] = np.where(ratings >= 2, 1, 0)
+    # df.to_csv("customer_join_base_debug_after_failflage.csv", index=False)
+    dedup_subset = ["name_key", "inspection_dt", "address"]
+    df = df.sort_values("analysis_neighborhood")
+    df = df.drop_duplicates(subset=dedup_subset, keep="first")
+    # df.to_csv("customer_join_dedup_debug.csv", index=False)
+    print(df[df["name_key"] == "THE MELT"].shape[0])
+    grouped = (
+        df.groupby(["name_key"])
         .agg(
-            latitude=("latitude", "mean"),
-            longitude=("longitude", "mean"),
+            total_inspections=("name", "size"),
             total_violations=("violation_count", "sum"),
-            total_inspections=("failFlag", "size"),
-            fails=("failFlag", "sum"),
+            avg_violation_count=("violation_count", "mean"),
+            fails=("fail_flag", "sum"),
         )
         .reset_index()
     )
+    # print("Grouped customer join df:", grouped.head())
 
-    # compute fail rate safely
-    agg["fail_rate"] = agg.apply(
-        lambda r: float(r["fails"]) / float(r["total_inspections"]) if r["total_inspections"] > 0 else 0.0,
+    df["_inspection_order"] = df["inspection_dt"].fillna(pd.Timestamp("1900-01-01"))
+    latest_idx = df.groupby("name_key")["_inspection_order"].idxmax()
+    latest_details = df.loc[latest_idx, [
+            "name_key",
+            "name",
+            "address",
+            "latitude",
+            "longitude",
+            "inspection_dt",
+            "facility_rating_status",
+        ]].rename(columns={
+            "name": "BusinessName",
+            "inspection_dt": "last_inspection_date",
+        })
+
+    merged = grouped.merge(latest_details, on="name_key", how="left")
+    merged["total_violations"] = merged["total_violations"].fillna(0)
+    merged["avg_violation_count"] = merged["avg_violation_count"].fillna(0)
+    merged["fail_rate"] = merged.apply(
+        lambda r: float(r["fails"]) / float(r["total_inspections"]) if r["total_inspections"] else 0.0,
         axis=1,
     )
+    # merged.to_csv("customer_join_merged_debug.csv", index=False)
+    google_df = load_google_clean_df()
+    if not google_df.empty:
+        merged = merged.merge(
+            google_df[
+                [
+                    "name_key",
+                    "google_rating",
+                    "google_reviews",
+                    "google_address",
+                    "google_lat",
+                    "google_lon",
+                ]
+            ],
+            on="name_key",
+            how="left",
+        )
 
-    # cache and (optionally) write debug join output
-    _customer_join_cache = agg
+        merged["address"] = merged["google_address"].combine_first(merged["address"])
+        merged["latitude"] = merged["google_lat"].combine_first(merged["latitude"])
+        merged["longitude"] = merged["google_lon"].combine_first(merged["longitude"])
+
+    merged.drop(columns=["_inspection_order"], errors="ignore", inplace=True)
+
+    _customer_join_cache = merged
     try:
         _customer_join_cache.to_csv("customer_join_debug.csv", index=False)
     except Exception:
-        # ignore file write issues in production path
         pass
+
     return _customer_join_cache
+
+
+def _normalize_name(value) -> str:
+    if value is None:
+        return ""
+    return str(value).strip().upper()
+
+
+FACILITY_STATUS_LABELS = {
+    0: "Pass",
+    1: "Conditional Pass",
+    2: "Fail",
+}
+
+
+def describe_facility_status(value) -> str:
+    try:
+        val = int(float(value))
+    except (TypeError, ValueError):
+        return "Unknown"
+    return FACILITY_STATUS_LABELS.get(val, "Unknown")
+
+
+#--------------------------for the cutomer niegbour endpoint------------------------
+##load google clean dataframe
+def load_google_clean_df() -> pd.DataFrame:
+    global _google_clean_cache
+    if _google_clean_cache is not None:
+        return _google_clean_cache
+
+    try:
+        df = pd.read_csv(GOOGLE_CLEAN_PATH)
+        df = df.copy()
+        df["name_key"] = df["name"].apply(_normalize_name)
+        df.rename(
+            columns={
+                "lat": "google_lat",
+                "lng": "google_lon",
+                "rating": "google_rating",
+                "user_ratings_total": "google_reviews",
+                "address": "google_address",
+            },
+            inplace=True,
+        )
+    except Exception as exc:
+        print("Error loading google_cleaned.csv", exc)
+        df = pd.DataFrame(columns=["name_key"])
+
+    _google_clean_cache = df
+    return _google_clean_cache
+
+##for loading the neigbhorhood data from vis_hispections.csv
+def _load_neighborhood_feature_df() -> pd.DataFrame:
+    global _neighborhood_feature_df
+    if _neighborhood_feature_df is not None:
+        return _neighborhood_feature_df
+
+    try:
+        df = pd.read_csv(NEIGHBORHOOD_SOURCE_PATH)
+        df = df.copy()
+        df["neighborhood_key"] = (
+            df["analysis_neighborhood"].astype(str).str.strip().str.lower()
+        )
+        df["name_key"] = df["name"].apply(_normalize_name)
+    except Exception as exc:
+        print("Error loading Visualization_HealthInspections.csv", exc)
+        df = pd.DataFrame()
+
+    _neighborhood_feature_df = df
+    return _neighborhood_feature_df
+#--------------------------------------------------
 
 @app.get("/data-insights")
 def data_insights():
@@ -399,28 +707,35 @@ import pandas as pd
 
 @app.get("/inspector-insights")
 def inspector_insights():
-    """Inspector risk analysis dashboard payload based on HealthInspectionsAll.csv.
+    base_df = _load_neighborhood_feature_df()
+    if base_df is None or base_df.empty:
+        summary = {
+            "total_inspections": 0,
+            "total_fails": 0,
+            "overall_fail_rate": None,
+            "risk_band_counts": [],
+            "business_risk_bands": [],
+            "high_risk_restaurants": None,
+            "low_risk_restaurants": None,
+        }
+        return {
+            "summary": summary,
+            "inspection_trends": [],
+            "inspection_type_stats": [],
+            "inspection_delay_stats": [],
+            "inspection_dow_stats": [],
+            "dow_month_heatmap": [],
+            "inspector_comparison": [],
+            "neighbourhood_analysis": [],
+            "inspection_year_pie": [],
+            "high_risk_records": [],
+            "violation_severity_pie": [],
+        }
 
-    Returns:
-        - schema: column names, dtypes, and an example value
-        - preview_rows: a few sample rows for table preview
-        - summary: total inspections, fails, fail rate, risk-band counts
-        - inspection_trends: yearly totals / fails / fail_rate
-        - inspector_comparison: per BusinessName_id stats (top 10)
-        - risk_distribution: counts by voilation_count (if present)
-        - high_risk_records: top high-risk businesses (if columns present)
-    """
-
-    # load the encoded CSV directly
-    df = pd.read_csv(
-        "C:/Users/lkneh/HealthScore-Predictor/data/clean/encoded/HealthInspectionsAll.csv"
-    )
-
-    # --- schema + preview ---
+    # --- schema + preview for debugging/QA ---
     schema = []
-    for col in df.columns:
-        col_series = df[col]
-        # pick first non-null example if available
+    for col in base_df.columns:
+        col_series = base_df[col]
         example_val = None
         non_null = col_series.dropna()
         if len(non_null) > 0:
@@ -433,50 +748,93 @@ def inspector_insights():
             }
         )
 
-    # ensure preview rows also only contain native Python types
-    preview_raw = df.head(5).to_dict(orient="records")
+    preview_raw = base_df.head(5).to_dict(orient="records")
     preview_rows = [
         {k: to_native(v) for k, v in row.items()}
         for row in preview_raw
     ]
 
-    # --- summary stats ---
-    total_inspections = int(len(df))
-    if "failFlag" in df.columns:
-        total_fails = int(df["failFlag"].sum())
-        overall_fail_rate = float(total_fails / total_inspections) if total_inspections > 0 else 0.0
-    else:
-        total_fails = None
-        overall_fail_rate = None
+    df = base_df.copy()
+    df["name_key"] = df["name"].apply(_normalize_name)
+    df = df[df["name_key"] != ""].copy()
+    df["inspection_dt"] = pd.to_datetime(df.get("inspection_date"), errors="coerce")
+    df = df.dropna(subset=["inspection_dt"]).copy()
 
-    # rating breakdown (use existing facility_rating_status instead of synthetic bands)
-    risk_band_counts = []
+    dedup_subset = ["name_key", "inspection_dt", "address"]
+    df = df.sort_values("analysis_neighborhood")
+    df = df.drop_duplicates(subset=dedup_subset, keep="first")
+
+    numeric_cols = [
+        "violation_count",
+        "facility_rating_status",
+        "has_violation_count",
+        "prev_rating_majority_3",
+        "days_since_last_inspection",
+        "avg_violation_count_last_3",
+    ]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
     if "facility_rating_status" in df.columns:
+        df["facility_rating_status"] = df["facility_rating_status"].fillna(1)
+    else:
+        df["facility_rating_status"] = 1
+
+    df["facility_rating_status"] = pd.to_numeric(
+        df["facility_rating_status"], errors="coerce"
+    ).fillna(1)
+    df["fail_flag"] = np.where(df["facility_rating_status"] >= 2, 1, 0)
+    df["fail_status_exact"] = np.where(df["facility_rating_status"] == 2, 1, 0)
+
+    df["insp_year"] = df["inspection_dt"].dt.year.astype("Int64")
+    df["insp_month"] = df["inspection_dt"].dt.month.astype("Int64")
+    df["insp_day"] = df["inspection_dt"].dt.day.astype("Int64")
+    df["insp_dow"] = ((df["inspection_dt"].dt.dayofweek + 1) % 7).astype("Int64")
+
+    df["BusinessName"] = df["name"].astype(str).str.strip()
+    df = df[df["BusinessName"] != ""].copy()
+
+    total_inspections = int(len(df))
+    total_fails = int(df["fail_flag"].sum()) if total_inspections else 0
+    overall_fail_rate = (
+        float(total_fails / total_inspections) if total_inspections else None
+    )
+
+    risk_band_counts = []
+    if total_inspections:
         band_counts = (
-            df.groupby("facility_rating_status")[df.columns[0]]
+            df.groupby("facility_rating_status")["BusinessName"]
             .size()
             .reset_index(name="count")
+            .sort_values("facility_rating_status")
         )
         risk_band_counts = [
-            {"band": str(r["facility_rating_status"]), "count": int(r["count"])}
+            {
+                "band": describe_facility_status(r["facility_rating_status"]),
+                "rating_code": safe_float(r["facility_rating_status"]),
+                "count": int(r["count"]),
+            }
             for _, r in band_counts.iterrows()
         ]
 
-    # high/low-risk restaurant counts at business level
     high_restaurants_count = None
     low_restaurants_count = None
     business_risk_bands = []
-    if "BusinessName" in df.columns and "failFlag" in df.columns:
-        biz_fail = (
-            df.groupby("BusinessName")["failFlag"]
-            .agg(total_inspections="size", fails="sum")
+    biz_stats = None
+    if total_inspections:
+        biz_stats = (
+            df.groupby("BusinessName")
+            .agg(
+                total_inspections=("fail_flag", "size"),
+                fails=("fail_flag", "sum"),
+                avg_violations=("violation_count", "mean"),
+            )
             .reset_index()
         )
-        high_restaurants_count = int((biz_fail["fails"] >= 1).sum())
-        low_restaurants_count = int((biz_fail["fails"] == 0).sum())
-
-        # derive simple business-level risk bands inspectors can scan quickly
-        biz_fail["fail_rate"] = biz_fail["fails"] / biz_fail["total_inspections"]
+        high_restaurants_count = int((biz_stats["fails"] >= 1).sum())
+        low_restaurants_count = int((biz_stats["fails"] == 0).sum())
+        biz_stats["fail_rate"] = biz_stats["fails"] / biz_stats["total_inspections"]
 
         def _band(row):
             if row["fails"] == 0:
@@ -485,14 +843,12 @@ def inspector_insights():
                 return "High (>=50% fails)"
             return "Medium"
 
-        biz_fail["risk_band"] = biz_fail.apply(_band, axis=1)
-
+        biz_stats["risk_band"] = biz_stats.apply(_band, axis=1)
         band_counts = (
-            biz_fail.groupby("risk_band")["BusinessName"]
+            biz_stats.groupby("risk_band")["BusinessName"]
             .size()
             .reset_index(name="businesses")
         )
-
         business_risk_bands = [
             {
                 "band": str(to_native(r.risk_band)),
@@ -511,43 +867,37 @@ def inspector_insights():
         "low_risk_restaurants": low_restaurants_count,
     }
 
-    # --- inspection trends over time (per year) ---
     inspection_trends = []
-    if "insp_year" in df.columns and "failFlag" in df.columns:
-        trend = (
-            df.groupby("insp_year")["failFlag"]
-            .agg(total="size", fails="sum")
-            .reset_index()
+    if total_inspections and df["insp_year"].notna().any():
+        trend_counts = (
+            df.groupby(["insp_year", "facility_rating_status"])
+            .size()
+            .unstack(fill_value=0)
+            .sort_index()
         )
-        trend["passes"] = trend["total"] - trend["fails"]
-        trend["fail_rate"] = trend["fails"] / trend["total"]
-        inspection_trends = [
-            {
-                "year": int(to_native(r.insp_year)),
-                "total": int(to_native(r.total)),
-                "fails": int(to_native(r.fails)),
-                "passes": int(to_native(r.passes)),
-                "fail_rate": float(to_native(r.fail_rate)),
-            }
-            for _, r in trend.iterrows()
-        ]
 
-    # --- inspection type fail rates (which types are riskier?) ---
+        for year, row in trend_counts.iterrows():
+            inspection_trends.append(
+                {
+                    "year": int(to_native(year)),
+                    "pass_count": int(to_native(row.get(0, 0))),
+                    "conditional_count": int(to_native(row.get(1, 0))),
+                    "fail_count": int(to_native(row.get(2, 0))),
+                }
+            )
+
     inspection_type_stats = []
-    if "inspection_type" in df.columns and "failFlag" in df.columns:
+    if "inspection_type_clean" in df.columns and total_inspections:
         type_g = (
-            df.groupby("inspection_type")["failFlag"]
+            df.groupby("inspection_type_clean")["fail_flag"]
             .agg(total="size", fails="sum")
             .reset_index()
         )
         type_g["fail_rate"] = type_g["fails"] / type_g["total"]
-
-        # focus on the most common types so the chart stays readable
         type_g = type_g.sort_values("total", ascending=False).head(10)
-
         inspection_type_stats = [
             {
-                "inspection_type": str(to_native(r.inspection_type)),
+                "inspection_type": str(to_native(r.inspection_type_clean)).replace("_", " ").title(),
                 "total": int(to_native(r.total)),
                 "fails": int(to_native(r.fails)),
                 "fail_rate": float(to_native(r.fail_rate)),
@@ -555,20 +905,16 @@ def inspector_insights():
             for _, r in type_g.iterrows()
         ]
 
-    # --- fail rates by day of week ---
     inspection_dow_stats = []
-    if "insp_dow" in df.columns and "failFlag" in df.columns:
-        dow_df = df[["insp_dow", "failFlag"]].copy()
-        dow_df["insp_dow"] = pd.to_numeric(dow_df["insp_dow"], errors="coerce")
-        dow_df = dow_df.dropna(subset=["insp_dow"]).astype({"insp_dow": int})
-
+    if total_inspections and df["insp_dow"].notna().any():
+        dow_df = df[["insp_dow", "fail_flag"]].dropna()
+        dow_df["insp_dow"] = dow_df["insp_dow"].astype(int)
         dow_g = (
-            dow_df.groupby("insp_dow")["failFlag"]
+            dow_df.groupby("insp_dow")["fail_flag"]
             .agg(total="size", fails="sum")
             .reset_index()
         )
         dow_g["fail_rate"] = dow_g["fails"] / dow_g["total"]
-
         dow_labels = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
         inspection_dow_stats = [
             {
@@ -578,154 +924,131 @@ def inspector_insights():
                 "fails": int(to_native(r.fails)),
                 "fail_rate": float(to_native(r.fail_rate)),
             }
-            for _, r in dow_g.iterrows()
+            for _, r in dow_g.sort_values("insp_dow").iterrows()
         ]
 
-    # --- risk vs time since last inspection (bucketed days) ---
     inspection_delay_stats = []
-    if {"days_since_last_inspection", "failFlag"}.issubset(df.columns):
-        delay_df = df[["days_since_last_inspection", "failFlag"]].copy()
-        # ensure numeric days, drop rows we can't interpret
+    if total_inspections and "days_since_last_inspection" in df.columns:
+        delay_df = df[["days_since_last_inspection", "fail_flag"]].copy()
         delay_df["days_since_last_inspection"] = pd.to_numeric(
             delay_df["days_since_last_inspection"], errors="coerce"
         )
         delay_df = delay_df.dropna(subset=["days_since_last_inspection"])
+        if not delay_df.empty:
+            bins = [-1, 0, 30, 90, 180, 365, float("inf")]
+            labels = ["0", "1–30", "31–90", "91–180", "181–365", "366+"]
+            delay_df["bucket"] = pd.cut(delay_df["days_since_last_inspection"], bins=bins, labels=labels)
+            d_g = (
+                delay_df.groupby("bucket")["fail_flag"]
+                .agg(total="size", fails="sum")
+                .reset_index()
+            )
+            d_g["fail_rate"] = d_g["fails"] / d_g["total"]
+            inspection_delay_stats = [
+                {
+                    "bucket": str(to_native(r.bucket)),
+                    "total": int(to_native(r.total)),
+                    "fails": int(to_native(r.fails)),
+                    "fail_rate": float(to_native(r.fail_rate)),
+                }
+                for _, r in d_g.iterrows()
+            ]
 
-        bins = [-1, 0, 30, 90, 180, 365, float("inf")]
-        labels = ["0", "1–30", "31–90", "91–180", "181–365", "366+"]
+    neighborhood_fail_stats = []
+    if total_inspections and "analysis_neighborhood" in df.columns:
+        n_df = df[["analysis_neighborhood", "fail_flag", "fail_status_exact"]].copy()
+        n_df["analysis_neighborhood"] = n_df["analysis_neighborhood"].astype(str).str.strip()
+        n_df = n_df[n_df["analysis_neighborhood"] != ""]
+        if not n_df.empty:
+            n_grouped = (
+                n_df.groupby("analysis_neighborhood")
+                .agg(
+                    total=("fail_flag", "size"),
+                    fail_records=("fail_status_exact", "sum"),
+                )
+                .reset_index()
+            )
+            n_grouped = n_grouped[n_grouped["fail_records"] > 0]
+            n_grouped = n_grouped.sort_values("fail_records", ascending=False)
+            neighborhood_fail_stats = [
+                {
+                    "neighborhood": to_native(r.analysis_neighborhood),
+                    "total": int(to_native(r.total)),
+                    "fails": int(to_native(r.fail_records)),
+                    "fail_rate": float(r.fail_records / r.total) if r.total else 0.0,
+                }
+                for _, r in n_grouped.iterrows()
+            ]
 
-        delay_df["bucket"] = pd.cut(
-            delay_df["days_since_last_inspection"], bins=bins, labels=labels
-        )
-
-        d_g = (
-            delay_df.groupby("bucket")["failFlag"]
-            .agg(total="size", fails="sum")
-            .reset_index()
-        )
-        d_g["fail_rate"] = d_g["fails"] / d_g["total"]
-
-        inspection_delay_stats = [
-            {
-                "bucket": str(to_native(r.bucket)),
-                "total": int(to_native(r.total)),
-                "fails": int(to_native(r.fails)),
-                "fail_rate": float(to_native(r.fail_rate)),
-            }
-            for _, r in d_g.iterrows()
-        ]
-
-    # --- calendar-style heatmap: insp_dow x insp_month ---
     dow_month_heatmap = []
-    if {"insp_month", "insp_dow", "failFlag"}.issubset(df.columns):
-        cal_cols = ["insp_month", "insp_dow", "failFlag"]
-        if "violation_count" in df.columns:
-            cal_cols.append("violation_count")
-        cal_df = df[cal_cols].copy()
-        cal_df["insp_month"] = pd.to_numeric(cal_df["insp_month"], errors="coerce")
-        cal_df["insp_dow"] = pd.to_numeric(cal_df["insp_dow"], errors="coerce")
+    if total_inspections:
+        cal_df = df[["insp_month", "insp_dow", "fail_flag", "violation_count"]].copy()
         cal_df = cal_df.dropna(subset=["insp_month", "insp_dow"])
-        cal_df = cal_df.astype({"insp_month": int, "insp_dow": int})
-
-        group_keys = ["insp_month", "insp_dow"]
-        agg_dict = {"failFlag": ["size", "mean"]}
-        if "violation_count" in cal_df.columns:
-            agg_dict["violation_count"] = "mean"
-
-        cal_g = cal_df.groupby(group_keys).agg(agg_dict).reset_index()
-        cal_g.columns = [
-            "insp_month",
-            "insp_dow",
-            "total",
-            "fail_rate",
-        ] + (["avg_violations"] if "violation_count" in cal_df.columns else [])
-
-        month_labels = {
-            1: "Jan",
-            2: "Feb",
-            3: "Mar",
-            4: "Apr",
-            5: "May",
-            6: "Jun",
-            7: "Jul",
-            8: "Aug",
-            9: "Sep",
-            10: "Oct",
-            11: "Nov",
-            12: "Dec",
-        }
-        dow_labels = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
-
-        for _, r in cal_g.iterrows():
-            row = {
-                "month_index": int(to_native(r.insp_month)),
-                "month": month_labels.get(int(to_native(r.insp_month)), str(to_native(r.insp_month))),
-                "dow_index": int(to_native(r.insp_dow)),
-                "dow": dow_labels.get(int(to_native(r.insp_dow)), str(to_native(r.insp_dow))),
-                "total": int(to_native(r.total)),
-                "fail_rate": float(to_native(r.fail_rate)),
+        if not cal_df.empty:
+            cal_df["insp_month"] = cal_df["insp_month"].astype(int)
+            cal_df["insp_dow"] = cal_df["insp_dow"].astype(int)
+            agg_dict = {
+                "fail_flag": ["size", "mean"],
+                "violation_count": "mean",
             }
-            if "avg_violations" in cal_g.columns:
-                row["avg_violations"] = float(to_native(r.avg_violations))
-            dow_month_heatmap.append(row)
-
-    # --- inspector / business comparison (top 10)
-    # kept for backwards compatibility, but no longer charted on the UI
-    inspector_comparison = []
-    if "BusinessName_id" in df.columns and "failFlag" in df.columns:
-        comp = (
-            df.groupby("BusinessName_id")["failFlag"]
-            .agg(total="size", fails="sum")
-            .reset_index()
-        )
-        comp["fail_rate"] = comp["fails"] / comp["total"]
-        comp = comp.sort_values("total", ascending=False).head(10)
-        inspector_comparison = [
-            {
-                "Business": int(to_native(r.BusinessName_id)),
-                "total": int(to_native(r.total)),
-                "fails": int(to_native(r.fails)),
-                "fail_rate": float(to_native(r.fail_rate)),
+            cal_g = cal_df.groupby(["insp_month", "insp_dow"]).agg(agg_dict).reset_index()
+            cal_g.columns = ["insp_month", "insp_dow", "total", "fail_rate", "avg_violations"]
+            month_labels = {
+                1: "Jan",
+                2: "Feb",
+                3: "Mar",
+                4: "Apr",
+                5: "May",
+                6: "Jun",
+                7: "Jul",
+                8: "Aug",
+                9: "Sep",
+                10: "Oct",
+                11: "Nov",
+                12: "Dec",
             }
-            for _, r in comp.iterrows()
-        ]
+            dow_labels = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
+            for _, r in cal_g.iterrows():
+                dow_month_heatmap.append(
+                    {
+                        "month_index": int(to_native(r.insp_month)),
+                        "month": month_labels.get(int(to_native(r.insp_month)), str(to_native(r.insp_month))),
+                        "dow_index": int(to_native(r.insp_dow)),
+                        "dow": dow_labels.get(int(to_native(r.insp_dow)), str(to_native(r.insp_dow))),
+                        "total": int(to_native(r.total)),
+                        "fail_rate": float(to_native(r.fail_rate)),
+                        "avg_violations": float(to_native(r.avg_violations)),
+                    }
+                )
 
-    # --- neighbourhood analysis using latitude / longitude ---
+    inspector_comparison = []  # BusinessName_id column not present in visualization dataset
+
     neighbourhood_analysis = []
-    if {"latitude", "longitude", "failFlag"}.issubset(df.columns):
-        loc = df[["latitude", "longitude", "failFlag"]].dropna()
-
-        # bucket into approximate neighbourhoods by rounding lat/lon
-        loc["lat_bin"] = loc["latitude"].round(3)
-        loc["lon_bin"] = loc["longitude"].round(3)
-
-        neigh = (
-            loc.groupby(["lat_bin", "lon_bin"])["failFlag"]
-            .agg(total="size", fails="sum")
-            .reset_index()
-        )
-        neigh["fail_rate"] = neigh["fails"] / neigh["total"]
-
-        # limit to most frequently inspected neighbourhoods so the chart stays readable
-        neigh = neigh.sort_values("total", ascending=False).head(60)
-
-        neighbourhood_analysis = [
-            {
-                "lat": float(to_native(r.lat_bin)),
-                "lon": float(to_native(r.lon_bin)),
-                "total": int(to_native(r.total)),
-                "fails": int(to_native(r.fails)),
-                "fail_rate": float(to_native(r.fail_rate)),
-            }
-            for _, r in neigh.iterrows()
-        ]
+    if total_inspections and {"latitude", "longitude"}.issubset(df.columns):
+        loc = df[["latitude", "longitude", "fail_flag"]].dropna()
+        if not loc.empty:
+            loc["lat_bin"] = loc["latitude"].round(3)
+            loc["lon_bin"] = loc["longitude"].round(3)
+            neigh = (
+                loc.groupby(["lat_bin", "lon_bin"]).agg(total=("fail_flag", "size"), fails=("fail_flag", "sum"))
+                .reset_index()
+            )
+            neigh["fail_rate"] = neigh["fails"] / neigh["total"]
+            neigh = neigh.sort_values("total", ascending=False).head(60)
+            neighbourhood_analysis = [
+                {
+                    "lat": float(to_native(r.lat_bin)),
+                    "lon": float(to_native(r.lon_bin)),
+                    "total": int(to_native(r.total)),
+                    "fails": int(to_native(r.fails)),
+                    "fail_rate": float(to_native(r.fail_rate)),
+                }
+                for _, r in neigh.iterrows()
+            ]
 
     inspection_year_pie = []
-
-    if "insp_year" in df.columns:
-        # Simple value_counts by year to avoid fragile column naming
-        year_counts = df["insp_year"].value_counts().sort_index()
-
+    if total_inspections:
+        year_counts = df["insp_year"].dropna().value_counts().sort_index()
         inspection_year_pie = [
             {
                 "label": str(int(to_native(year))),
@@ -734,51 +1057,40 @@ def inspector_insights():
             for year, count in year_counts.items()
         ]
 
-    
     high_risk_records = []
-
-    required_cols = {"BusinessName", "insp_year", "failFlag", "violation_count"}
-    if required_cols.issubset(df.columns):
-        high_risk = (
-            df.groupby(["BusinessName", "insp_year"])
-            .agg(
-                total_inspections=("failFlag", "size"),
-                fails=("failFlag", "sum"),
-                avg_violations=("violation_count", "mean"),
-            )
-            .reset_index()
-        )
-
-        high_risk["fail_rate"] = high_risk["fails"] / high_risk["total_inspections"]
-
-        # define "high risk": at least one failure, then sort by fail_rate and avg_violations
-        high_risk = high_risk[high_risk["fails"] >= 1]
-
-        high_risk = high_risk.sort_values(
-            ["fail_rate", "avg_violations"],
-            ascending=False
-        ).head(30)
-
-        high_risk_records = [
-            {
-                "BusinessName": to_native(r.BusinessName),
-                "year": int(to_native(r.insp_year)),
-                "total_inspections": int(to_native(r.total_inspections)),
-                "fails": int(to_native(r.fails)),
-                "fail_rate": float(to_native(r.fail_rate)),
-                "avg_violations": float(to_native(r.avg_violations)),
-            }
-            for _, r in high_risk.iterrows()
+    if biz_stats is not None and not biz_stats.empty:
+        latest_idx = df.groupby("BusinessName")["inspection_dt"].idxmax()
+        latest_status = df.loc[
+            latest_idx,
+            ["BusinessName", "inspection_dt", "facility_rating_status"],
         ]
+        latest_status = latest_status.rename(columns={"inspection_dt": "last_inspection"})
+        latest_status["insp_year"] = latest_status["last_inspection"].dt.year.astype("Int64")
+
+        high_risk = biz_stats.merge(latest_status, on="BusinessName", how="left")
+        high_risk = high_risk[high_risk["fails"] >= 1]
+        if not high_risk.empty:
+            high_risk = high_risk.sort_values(
+                ["fails", "fail_rate", "avg_violations"], ascending=False
+            ).head(30)
+            high_risk_records = [
+                {
+                    "BusinessName": to_native(r.BusinessName),
+                    "year": int(to_native(r.insp_year)) if pd.notna(r.insp_year) else None,
+                    "total_inspections": int(to_native(r.total_inspections)),
+                    "fails": int(to_native(r.fails)),
+                    "fail_rate": float(to_native(r.fail_rate)),
+                    "avg_violations": float(to_native(r.avg_violations)) if pd.notna(r.avg_violations) else None,
+                    "facility_rating_status": safe_float(r.facility_rating_status),
+                    "status_label": describe_facility_status(r.facility_rating_status),
+                }
+                for _, r in high_risk.iterrows()
+            ]
+
     violation_severity_pie = []
-
-    if "violation_count" in df.columns:
-        bins = [-1, 0, 2, 5, float("inf")]
-        labels = ["0", "1–2", "3–5", "6+"]
-
-        severity = pd.cut(df["violation_count"], bins=bins, labels=labels)
+    if "violation_count" in df.columns and total_inspections:
+        severity = pd.cut(df["violation_count"], bins=[-1, 0, 2, 5, float("inf")], labels=["0", "1–2", "3–5", "6+"])
         severity_counts = severity.value_counts().sort_index()
-
         violation_severity_pie = [
             {
                 "label": str(label),
@@ -792,6 +1104,7 @@ def inspector_insights():
         "inspection_trends": inspection_trends,
         "inspection_type_stats": inspection_type_stats,
         "inspection_delay_stats": inspection_delay_stats,
+        "neighborhood_fail_stats": neighborhood_fail_stats,
         "inspection_dow_stats": inspection_dow_stats,
         "dow_month_heatmap": dow_month_heatmap,
         "inspector_comparison": inspector_comparison,
@@ -804,16 +1117,12 @@ def inspector_insights():
 
 @app.get("/customer-business")
 def customer_business(name: str):
-    """Lookup a single business for the customer dashboard.
 
-    Joins inspection history with Google rating using
-    name + latitude + longitude as keys.
-    """
     df = load_customer_join_df()
     if df is None or df.empty:
-        return {"error": "Joined business data not available"}
+        return {"error": "Business insights not available"}
 
-    key = name.strip().upper()
+    key = _normalize_name(name)
     if not key:
         return {"error": "Business name is required"}
 
@@ -821,31 +1130,278 @@ def customer_business(name: str):
     if not exact.empty:
         candidates = exact
     else:
-        # fall back to contains search for partial matches
         candidates = df[df["name_key"].str.contains(key, na=False)]
 
     if candidates.empty:
         return {"error": "No matching business found"}
 
-    # pick the most inspected match as the best candidate
-    row = candidates.sort_values("total_inspections", ascending=False).iloc[0]
+    row = (
+        candidates.sort_values(
+            ["total_inspections", "last_inspection_date"],
+            ascending=[False, False],
+        ).iloc[0]
+    )
 
     resp = {
-        "business_name": to_native(row["BusinessName"]),
-        "address": to_native(row["address"]),
-        "latitude": safe_float(row["latitude"]),
-        "longitude": safe_float(row["longitude"]),
-        "total_inspections": int(row["total_inspections"]),
-        "total_violations": int(row["total_violations"]),
-        "fails": int(row["fails"]),
-        "fail_rate": safe_float(row["fail_rate"]),
-        "google_rating": safe_float(row["rating"]),
+        "business_name": to_native(row.get("BusinessName")) or name.strip(),
+        "address": to_native(row.get("address")),
+        "latitude": safe_float(row.get("latitude")),
+        "longitude": safe_float(row.get("longitude")),
+        "total_inspections": int(safe_float(row.get("total_inspections")) or 0),
+        "total_violations": int(safe_float(row.get("total_violations")) or 0),
+        "fails": int(safe_float(row.get("fails")) or 0),
+        "fail_rate": safe_float(row.get("fail_rate")),
+        "google_rating": safe_float(row.get("google_rating")),
+        "avg_violation_count": safe_float(row.get("avg_violation_count")),
+        "last_inspection_date": to_native(row.get("last_inspection_date")),
     }
 
-    reviews = row.get("user_ratings_total")
+    reviews = row.get("google_reviews")
     try:
         resp["google_reviews"] = int(reviews) if pd.notna(reviews) else None
     except Exception:
         resp["google_reviews"] = None
 
     return resp
+
+
+@app.get("/customer-neighborhoods")
+def customer_neighborhoods(name: Optional[str] = None):
+
+    df = _load_neighborhood_feature_df()
+    google_df = load_google_clean_df()
+
+    if df is None or df.empty:
+        return {"options": [], "message": "Neighborhood feature dataset not available"}
+
+    options = (
+        df["analysis_neighborhood"].dropna().astype(str).str.strip().replace("", np.nan).dropna().unique()
+    )
+    payload = {"options": sorted(options.tolist())}
+
+    if not name:
+        return payload
+
+    key = name.strip().lower()
+    subset = df[df["neighborhood_key"] == key].copy()
+    if subset.empty:
+        raise HTTPException(status_code=404, detail="Neighborhood not recognized or has no records")
+
+    numeric_cols = [
+        "violation_count",
+        "avg_violation_count_last_3",
+        "days_since_last_inspection",
+        "is_first_inspection",
+        "prev_rating_majority_3",
+        "facility_rating_status",
+        "has_violation_count",
+    ]
+    for col in numeric_cols:
+        if col in subset.columns:
+            subset[col] = pd.to_numeric(subset[col], errors="coerce")
+
+    subset["inspection_dt"] = pd.to_datetime(subset.get("inspection_date"), errors="coerce")
+    rating_series = subset.get("facility_rating_status")
+    if rating_series is not None:
+        subset["fail_flag"] = (rating_series.fillna(1) >= 2).astype(int)
+    else:
+        subset["fail_flag"] = 0
+
+    def _mean_of(col_name: str):
+        if col_name not in subset.columns:
+            return None
+        series = subset[col_name].replace([np.inf, -np.inf], np.nan).dropna()
+        if series.empty:
+            return None
+        return safe_float(float(series.mean()))
+
+    total_inspections = int(len(subset))
+
+    mix = []
+    if "inspection_type_clean" in subset.columns:
+        mix_counts = subset["inspection_type_clean"].dropna().value_counts().head(10)
+        total_mix = float(mix_counts.sum()) if len(mix_counts) else 0.0
+        for label, count in mix_counts.items():
+            entry = {
+                "inspection_type": str(label).replace("_", " ").title(),
+                "count": int(count),
+            }
+            if total_mix > 0:
+                entry["share"] = safe_float(count / total_mix)
+            mix.append(entry)
+
+    summary = {
+        "neighborhood": name.strip(),
+        "total_inspections": total_inspections,
+        "avg_violation_count": _mean_of("violation_count"),
+        "avg_violation_count_last_3": _mean_of("avg_violation_count_last_3"),
+        "avg_days_since_last_inspection": _mean_of("days_since_last_inspection"),
+        "first_inspection_rate": _mean_of("is_first_inspection"),
+        "avg_prev_rating_majority_3": _mean_of("prev_rating_majority_3"),
+        "avg_facility_rating_status": _mean_of("facility_rating_status"),
+        "inspection_mix": mix,
+    }
+
+    biz = subset.copy()
+    biz["name_key"] = biz["name"].apply(_normalize_name)
+
+    dedup_subset = ["name_key", "inspection_dt", "address"]
+    biz = biz.sort_values("analysis_neighborhood")
+    biz = biz.drop_duplicates(subset=dedup_subset, keep="first")
+
+    grouped = (
+        biz.groupby("name_key")
+        .agg(
+            total_inspections=("name", "size"),
+            total_violations=("violation_count", "sum"),
+            avg_violation_count=("violation_count", "mean"),
+            avg_days_since_last=("days_since_last_inspection", "mean"),
+            first_inspection_rate=("is_first_inspection", "mean"),
+            avg_prev_rating=("prev_rating_majority_3", "mean"),
+            fails=("fail_flag", "sum"),
+        )
+        .reset_index()
+    )
+    
+    grouped["fail_rate"] = grouped.apply(
+        lambda r: float(r["fails"]) / float(r["total_inspections"]) if r["total_inspections"] else 0.0,
+        axis=1,
+    )
+
+    latest_idx = biz.groupby("name_key")["inspection_dt"].idxmax()
+    latest_details = (
+        biz.loc[latest_idx, [
+            "name_key",
+            "inspection_dt",
+            "facility_rating_status",
+            "address",
+            "name",
+            "latitude",
+            "longitude",
+        ]]
+        .rename(columns={"name": "display_name"})
+    )
+    business_df = grouped.merge(latest_details, on="name_key", how="left")
+
+    if not google_df.empty:
+        business_df = business_df.merge(
+            google_df[
+                [
+                    "name_key",
+                    "google_rating",
+                    "google_reviews",
+                    "google_address",
+                    "google_lat",
+                    "google_lon",
+                ]
+            ],
+            on="name_key",
+            how="left",
+        )
+
+    business_df["google_rating"] = pd.to_numeric(
+        business_df.get("google_rating"), errors="coerce"
+    )
+    business_df["google_reviews"] = pd.to_numeric(
+        business_df.get("google_reviews"), errors="coerce"
+    )
+    business_df["avg_violation_count"] = pd.to_numeric(
+        business_df.get("avg_violation_count"), errors="coerce"
+    )
+    business_df["avg_days_since_last"] = pd.to_numeric(
+        business_df.get("avg_days_since_last"), errors="coerce"
+    )
+    business_df["fail_rate"] = pd.to_numeric(
+        business_df.get("fail_rate"), errors="coerce"
+    )
+
+    inspection_series = pd.to_datetime(
+        business_df.get("inspection_dt"), errors="coerce", utc=True
+    )
+    now_utc = pd.Timestamp.now(tz="UTC")
+    business_df["days_since_latest"] = (
+        now_utc - inspection_series
+    ).dt.days
+    business_df["inspection_dt"] = inspection_series.dt.tz_convert("UTC").dt.tz_localize(None)
+
+    recent_window_days = 365.0
+    business_df["recent_factor"] = (
+        recent_window_days
+        - business_df["days_since_latest"].clip(lower=0).fillna(recent_window_days)
+    )
+    business_df["recent_factor"] = (
+        business_df["recent_factor"].clip(lower=0) / recent_window_days
+    )
+    business_df["score"] = (
+        business_df["google_rating"].fillna(0) * 1000
+        + business_df["google_reviews"].fillna(0)
+        - business_df["total_violations"].fillna(0) * 10
+        - business_df["fail_rate"].fillna(0) * 1000
+        # + business_df["recent_factor"].fillna(0) * 500
+    )
+    # business_df.to_csv("debug_neighborhood_business_scores.csv", index=False)
+    eligible = business_df[
+        # (business_df["score"] > 1000)
+        # & (business_df["google_reviews"] > 1000)
+        # & business_df["inspection_dt"].notna()
+        # & (business_df["inspection_dt"] >= MIN_INSPECTION_DATE)
+        (business_df["avg_violation_count"] == 0)
+        & (business_df["facility_rating_status"] == 0)
+    ]
+
+    if eligible.empty:
+        payload["summary"] = summary
+        payload["top_restaurants"] = []
+        payload["map_points"] = []
+        payload["message"] = (
+            "No high-scoring restaurants with recent inspections were found."
+        )
+        return payload
+
+    business_df = eligible.sort_values("score", ascending=False).head(10)
+    # business_df = business_df.sort_values("inspection_dt", ascending=False)
+    
+
+    top_restaurants = []
+    map_points = []
+    for _, row in business_df.iterrows():
+        lat = row.get("google_lat")
+        lon = row.get("google_lon")
+        if pd.isna(lat) or pd.isna(lon):
+            lat = row.get("latitude")
+            lon = row.get("longitude")
+
+        entry = {
+            "name": to_native(row.get("display_name")) or to_native(row.get("name_key")),
+            "address": to_native(row.get("google_address")) or to_native(row.get("address")),
+            "rating": safe_float(row.get("google_rating")),
+            "user_ratings_total": int(row.get("google_reviews")) if pd.notna(row.get("google_reviews")) else None,
+            "total_inspections": int(row.get("total_inspections", 0) or 0),
+            "total_violations": safe_float(row.get("total_violations")),
+            "avg_violation_count": safe_float(row.get("avg_violation_count")),
+            "last_inspection_date": to_native(row.get("inspection_dt")),
+            "facility_rating_status": safe_float(row.get("facility_rating_status")),
+            "days_since_last_inspection": (
+                int(row.get("days_since_latest"))
+                if pd.notna(row.get("days_since_latest"))
+                else None
+            ),
+            "fail_rate": safe_float(row.get("fail_rate")),
+            "lat": safe_float(lat),
+            "lon": safe_float(lon),
+        }
+        top_restaurants.append(entry)
+
+        if entry["lat"] is not None and entry["lon"] is not None:
+            map_points.append({
+                "name": entry["name"],
+                "lat": entry["lat"],
+                "lon": entry["lon"],
+                "rating": entry["rating"],
+            })
+
+    payload["summary"] = summary
+    payload["top_restaurants"] = top_restaurants
+    payload["map_points"] = map_points
+    payload.pop("message", None)
+    return payload
