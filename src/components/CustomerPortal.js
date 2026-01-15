@@ -48,14 +48,22 @@ export default function CustomerPortal() {
                 onClick={() => handleSelect("restaurant")}
               >
                 <span style={{ display: "block", textAlign: "center" }}>Restaurant view</span>
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
               </button>
               <button
                 className="customer-mode-btn secondary"
                 onClick={() => handleSelect("neighborhood")}
               >
                 <span style={{ display: "block", textAlign: "center" }}>Analyze neighborhood</span>
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
               </button>
             </div>
           </div>
@@ -74,4 +82,8 @@ export default function CustomerPortal() {
       )}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd

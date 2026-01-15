@@ -3,7 +3,7 @@
 const BASE_URL = "http://localhost:8000";
 
 export async function runPrediction(payload) {
-  const res = await fetch(`${BASE_URL}/predict`, {
+  const res = await fetch(`${BASE_URL}/predict-inspector`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -26,6 +26,19 @@ export async function lookupBusinessCustomer(name) {
 
   return res.json();
 }
+export async function fetchCustomerNeighborhoods(name) {
+  const endpoint = name
+    ? `${BASE_URL}/customer-neighborhoods?name=${encodeURIComponent(name)}`
+    : `${BASE_URL}/customer-neighborhoods`;
+
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.status}`);
+  }
+
+  return res.json();
+}
+
 export async function fetchCustomerNeighborhoods(name) {
   const endpoint = name
     ? `${BASE_URL}/customer-neighborhoods?name=${encodeURIComponent(name)}`

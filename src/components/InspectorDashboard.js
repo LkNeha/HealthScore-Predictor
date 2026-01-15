@@ -18,7 +18,6 @@ import {
   ScatterChart,
   Scatter,
   ZAxis,
-  ComposedChart,
 } from "recharts";
 import CountUp from "react-countup";
 
@@ -65,7 +64,10 @@ export default function InspectorDashboard({ onBack }) {
     inspectionDate: "",
     inspectionType: "",
     analysisNeighborhood: "",
+<<<<<<< HEAD
     violationCount: "",
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
   });
 
 
@@ -96,6 +98,7 @@ export default function InspectorDashboard({ onBack }) {
     }
   }, [step]);
   const trends = insights?.inspection_trends || [];
+<<<<<<< HEAD
   const trendsWithTotal = trends.map((row) => ({
     ...row,
     total:
@@ -108,14 +111,25 @@ export default function InspectorDashboard({ onBack }) {
   const neighborhoodFails = (insights?.neighborhood_fail_stats || []).slice(0, 12);
 
   const riskDist = insights?.inspection_year_pie || [];
+=======
+  
+  const neighborhoodFails = (insights?.neighborhood_fail_stats || []).slice(0, 12);
+  
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
   const failYearPie = trends
     .map((row) => ({
       label: row?.year,
       value: row?.fail_count || 0,
     }))
     .filter((row) => row.label != null && row.value > 0);
+<<<<<<< HEAD
   const hasYearPie = failYearPie.length > 0;
 
+=======
+  
+  const hasYearPie = failYearPie.length > 0;
+  
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
   const highRisk = insights?.high_risk_records || [];
   const [highRiskLimit, setHighRiskLimit] = useState(10);
   const highRiskToShow = highRisk.slice(0, highRiskLimit);
@@ -142,32 +156,51 @@ export default function InspectorDashboard({ onBack }) {
     setLoading(true);
     setError(null);
     setShowAnswer(false);
+<<<<<<< HEAD
+=======
+
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
     // Derive date-based features from the selected inspection date
     const inspectionDateObj = form.inspectionDate
       ? new Date(form.inspectionDate)
       : null;
     const isValidDate = (d) => d instanceof Date && !Number.isNaN(d.getTime());
+<<<<<<< HEAD
+=======
+
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
     let inspYear = 0;
     let inspMonth = 0;
     let inspDay = 0;
     let inspDow = 0; // 0 (Sunday) - 6 (Saturday)
+<<<<<<< HEAD
+=======
+
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
     if (isValidDate(inspectionDateObj)) {
       inspYear = inspectionDateObj.getFullYear();
       inspMonth = inspectionDateObj.getMonth() + 1; // JS months are 0-based
       inspDay = inspectionDateObj.getDate();
       inspDow = inspectionDateObj.getDay();
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
     try {
       const data = await runPrediction({
         business_name: form.businessName,
         inspection_type: form.inspectionType,
         inspection_date: form.inspectionDate,
         analysis_neighborhood: form.analysisNeighborhood,
+<<<<<<< HEAD
         // Optional override: current inspection's violation count
         violation_count:
           form.violationCount !== "" && !Number.isNaN(Number(form.violationCount))
             ? Number(form.violationCount)
             : null,
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
       });
 
       setPrediction(data);
@@ -332,6 +365,7 @@ export default function InspectorDashboard({ onBack }) {
                   />
                   <Line
                     type="monotone"
+<<<<<<< HEAD
                     dataKey="total"
                     name="Total inspections"
                     stroke="#3b82f6"
@@ -339,6 +373,8 @@ export default function InspectorDashboard({ onBack }) {
                   />
                   <Line
                     type="monotone"
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
                     dataKey="conditional_count"
                     name="Conditional Pass"
                     stroke="#0077b6"
@@ -618,10 +654,15 @@ export default function InspectorDashboard({ onBack }) {
               )}
             </div> */}
 
+<<<<<<< HEAD
             {/* Distribution Pies (Year + Violation Severity) */}
             {/* Distribution Pie: Fail Counts by Year */}
             <div className="panel">
               <h3>Risk Distributions</h3>
+=======
+            {/* Distribution Pie: Fail Counts by Year */}
+            <div className="panel">
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
               <h3>Fail Distribution by Year</h3>
               <div>
                 <h4
@@ -631,7 +672,10 @@ export default function InspectorDashboard({ onBack }) {
                     color: "#9ca3af",
                   }}
                 >
+<<<<<<< HEAD
                   By Year
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
                   Inspections rated Fail (status 2)
                 </h4>
                 {hasYearPie ? (
@@ -657,14 +701,16 @@ export default function InspectorDashboard({ onBack }) {
                   </ResponsiveContainer>
                 ) : (
                   <p className="prediction-sub">
+<<<<<<< HEAD
                     No year distribution data available.
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
                     No fail counts detected for the selected years.
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Operational / Scheduling View: Risk vs Days Since Last Inspection */}
             <div className="panel">
               <h3>Neighborhood Fail Hotspots</h3>
               <p className="prediction-sub" style={{ marginBottom: 8 }}>
@@ -672,6 +718,7 @@ export default function InspectorDashboard({ onBack }) {
               </p>
               {neighborhoodFails.length > 0 ? (
                 <div className="chart-scroll-wrapper">
+<<<<<<< HEAD
                   <ResponsiveContainer
                     width={Math.min(1200, neighborhoodFails.length * 120)}
                     height={280}
@@ -731,6 +778,42 @@ export default function InspectorDashboard({ onBack }) {
                         dot={{ r: 3 }}
                       />
                     </BarChart>
+=======
+                  <ResponsiveContainer width={Math.min(1200, neighborhoodFails.length * 120)} height={280}>
+                    <BarChart data={neighborhoodFails} margin={{ left: -10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis
+                      dataKey="neighborhood"
+                      interval={0}
+                      angle={-25}
+                      textAnchor="end"
+                      height={90}
+                      tick={{ fontSize: 11, fill: "#111827" }}
+                    />
+                    <YAxis
+                      allowDecimals={false}
+                      stroke="#111827"
+                      tick={{ fontSize: 11, fill: "#111827" }}
+                    />
+                    <Tooltip
+                      formatter={(value, name, payload) => {
+                        if (name === "fails") return [value, "Fails (rating 2)"];
+                        if (name === "total") return [value, "Total inspections"];
+                        if (name === "fail_rate") {
+                          return [`${(value * 100).toFixed(1)}%`, "Fail rate"];
+                        }
+                        return [value, name];
+                      }}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="fails"
+                      name="Fails (rating 2)"
+                      fill="#ef4444"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
                   </ResponsiveContainer>
                 </div>
               ) : (
@@ -765,6 +848,7 @@ export default function InspectorDashboard({ onBack }) {
                 onChange={updateField("businessName")}
               />
             </div>
+
             <div className="field">
               <label>Date</label>
               <input
@@ -773,6 +857,7 @@ export default function InspectorDashboard({ onBack }) {
                 value={form.inspectionDate}
                 onChange={updateField("inspectionDate")}
               />
+<<<<<<< HEAD
             </div>
             <div className="field">
               <label>Violation count (this inspection)</label>
@@ -783,7 +868,10 @@ export default function InspectorDashboard({ onBack }) {
                 value={form.violationCount}
                 onChange={updateField("violationCount")}
               />
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
             </div>
+
             <div className="field">
               <label>Inspection Type</label>
               <select className="select-inspection"

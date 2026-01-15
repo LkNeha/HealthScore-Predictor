@@ -323,4 +323,8 @@ function NeighborhoodMap({ points }) {
       ))}
     </MapContainer>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd

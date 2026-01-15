@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import DashboardCards from "../components/DashboardCards";
 import InspectorDashboard from "../components/InspectorDashboard";
+<<<<<<< HEAD
 import CustomerDashboard from "../components/CustomerDashboard";
+=======
+>>>>>>> bfb45c06d8d8e1293aeea4913c9c56f0727c1ddd
 import CustomerPortal from "../components/CustomerPortal";
 import ExploreDashboard from "../components/ExploreDashboard";
 import DataDashboard from "../components/DataDashboard";
