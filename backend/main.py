@@ -21,9 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# subset["fail_flag"] = (
-#         subset.get("facility_rating_status_y").fillna(1) <= 0
-#     ).astype(int)
+
 
 # MODEL_PATH = Path(__file__).parent / "model" / "xgboost_tuned_scaleweight.pkl"
 MODEL_PATH = 'C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
@@ -43,6 +41,7 @@ RF_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model
 XGB_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/xgboost_multiclass_model_20260115_000350.pkl"
 MULTICLASS_SCALER_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/scaler_20260115_000350.pkl"
 METRICS_PKL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/model_metrics_20260115_000350.pkl"
+RF_METRICS_PKL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/rfmodel_metrics.pkl"
 TOP_SCORE_THRESHOLD = 3000
 MIN_INSPECTION_DATE = pd.Timestamp("2023-01-01")
 
@@ -132,7 +131,7 @@ NEIGHBOURHOOD_OHE_FEATURES = [
 ]
 
 
-# from frontend (compact payload for model features)
+# from frontend 
 class PredictionInput(BaseModel):
     violation_count: float
     has_violation_count: int
@@ -149,9 +148,6 @@ class PredictRequest(BaseModel):
     inspection_type: str
     inspection_date: date
     analysis_neighborhood: str
-    # Optional override for the current inspection's violation count.
-    # If provided, it will replace the violation_count and has_violation_count
-    # derived from the visualization dataset when building features.
     violation_count: Optional[float] = None
 
 
@@ -162,7 +158,6 @@ class PredictionOutput(BaseModel):
     risk_score: float
     outcome_label: int    # 0 or 1
     outcome_text: str
-    # Multiclass details (optional; used by /predict)
     proba_pass: Optional[float] = None
     proba_conditional: Optional[float] = None
     proba_fail: Optional[float] = None
@@ -236,30 +231,23 @@ def test_model():
 
 
 def _load_multiclass_model_and_scaler():
-    """Lazy-load the multiclass XGBoost model and its scaler."""
+    global _rf_multiclass_model, _xgb_multiclass_scaler
 
-    global _xgb_multiclass_model, _xgb_multiclass_scaler
-
-    if _xgb_multiclass_model is None:
-        obj = joblib.load(XGB_MULTICLASS_MODEL_PATH)
-        # Notebook saved the bare estimator via joblib.dump(xgb_tuned, ...)
+    if _rf_multiclass_model is None:
+        obj = joblib.load(RF_MULTICLASS_MODEL_PATH)
         if isinstance(obj, dict) and "model" in obj:
-            _xgb_multiclass_model = obj["model"]
+            _rf_multiclass_model = obj["model"]
         else:
-            _xgb_multiclass_model = obj
+            _rf_multiclass_model = obj
 
     if _xgb_multiclass_scaler is None:
         _xgb_multiclass_scaler = joblib.load(MULTICLASS_SCALER_PATH)
 
-    return _xgb_multiclass_model, _xgb_multiclass_scaler
+    return _rf_multiclass_model, _xgb_multiclass_scaler
 
 
 def _load_model_dataset_df() -> pd.DataFrame:
-    """Lazy-load the multiclass training dataset used to fit the model.
 
-    This is only for debugging / sanity checks (e.g., inspecting
-    how the trained model scores rows that are true FAILs).
-    """
     global _model_dataset_cache
 
     if _model_dataset_cache is not None:
@@ -276,15 +264,6 @@ def _load_model_dataset_df() -> pd.DataFrame:
 
 
 def _build_multiclass_features_from_visualization(payload: PredictRequest) -> np.ndarray:
-    """Construct model_dataset-style features from Visualization_HealthInspections.
-
-    Steps:
-    - Find the matching business row in the visualization CSV (latest inspection).
-    - Pull violation_count, prev_rating_majority_3, avg_violations, etc.
-    - Recompute days_since_last_inspection from the last inspection date to the
-      target inspection_date provided by the frontend.
-    - One-hot encode analysis_neighborhood and inspection_type into MODEL_FEATURES.
-    """
     df = _load_neighborhood_feature_df()
     if df is None or df.empty:
         raise HTTPException(status_code=500, detail="Visualization dataset not available")
@@ -338,23 +317,21 @@ def _build_multiclass_features_from_visualization(payload: PredictRequest) -> np
 
     days_since_last = max((target_date - last_insp_date).days, 0)
 
-    # Scalar features for the *current* inspection violations.
+    # Scalar features for the current inspection violations.
     # By default, if the inspector does not provide a violation_count,
-    # we assume 0 violations for this inspection and has_violation_count = 0,
-    # instead of using the historical violation_count from the dataset.
+    # we assume 0 violations for this inspection, but we now
+    # always set has_violation_count = 1 as requested.
     violation_count = 0.0
-    has_violation_count = 0
+    has_violation_count = 1
 
     # If the inspector provides a current violation_count in the request,
-    # use that value and derive has_violation_count from it.
+    # use that value, but keep has_violation_count hard-coded to 1.
     if payload.violation_count is not None:
         try:
             violation_count = float(payload.violation_count)
-            has_violation_count = 1 if violation_count > 0 else 0
         except Exception:
-            # If parsing fails, keep the default 0/0
+            # If parsing fails, keep the default 0.0
             violation_count = 0.0
-            has_violation_count = 0
     prev_rating_majority_3 = _safe_series_float(ref_row, "prev_rating_majority_3", default=0.0)
     avg_viol_last_3 = _safe_series_float(ref_row, "avg_violation_count_last_3", default=0.0)
     is_first_inspection = int(_safe_series_float(ref_row, "is_first_inspection", default=0.0))
@@ -395,14 +372,13 @@ def _build_multiclass_features_from_visualization(payload: PredictRequest) -> np
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(payload: PredictRequest):
-    xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
+    rf_model, scaler_mc = _load_multiclass_model_and_scaler()
 
     X_raw = _build_multiclass_features_from_visualization(payload)
-    # print("Raw features:", X_raw)
     X_scaled = scaler_mc.transform(X_raw)
 
-    proba_all = xgb_model.predict_proba(X_scaled)[0]
-    classes = getattr(xgb_model, "classes_", np.array([0, 1, 2]))
+    proba_all = rf_model.predict_proba(X_scaled)[0]
+    classes = getattr(rf_model, "classes_", np.array([0, 1, 2]))
 
     # Probability of FAIL (class 2) for risk banding
     fail_index = None
@@ -430,7 +406,7 @@ def predict(payload: PredictRequest):
     p_conditional = _get_proba_for_class(1)
     p_fail = _get_proba_for_class(2)
 
-    y_hat = int(xgb_model.predict(X_scaled)[0])
+    y_hat = int(rf_model.predict(X_scaled)[0])
 
     # Map probability to LOW / MEDIUM / HIGH as before
     if p_fail > 0.7:
@@ -467,13 +443,6 @@ def predict(payload: PredictRequest):
 
 @app.get("/debug-fail-samples")
 def debug_fail_samples(limit: int = 5):
-    """Inspect how the multiclass model scores true FAIL rows from the training set.
-
-    A FAIL is indicated by facility_rating_status == 2 in model_dataset.csv.
-    This endpoint returns a small sample of such rows with the model's
-    predicted probabilities for classes 0, 1, 2.
-    """
-
     xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
     df = _load_model_dataset_df()
 
@@ -541,24 +510,6 @@ def debug_fail_input_examples(
     violation_count: Optional[float] = None,
     inspection_date: Optional[date] = None,
 ):
-    """Find concrete business inputs that the live pipeline predicts as FAIL.
-
-    This uses Visualization_HealthInspections + the same feature construction
-    as /predict to locate (business, neighborhood, date, type) combos where
-    the multiclass model predicts class 2 (FAIL) with proba_fail >= threshold.
-
-    If a violation_count query parameter is provided, it is passed through to
-    /predict as the current inspection's violation_count, so you can see which
-    combinations would be flagged as FAIL for that level of violations.
-
-    If an inspection_date query parameter is provided (YYYY-MM-DD), it is used
-    as the inspection date seen by the model; otherwise the latest historical
-    inspection date from the dataset is used.
-
-    The response gives you values you can plug directly into the frontend
-    form (business_name, analysis_neighborhood, inspection_type, inspection_date).
-    """
-
     xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
     df = _load_neighborhood_feature_df()
 
@@ -664,21 +615,6 @@ def debug_conditional_input_examples(
     violation_count: Optional[float] = None,
     inspection_date: Optional[date] = None,
 ):
-    """Find concrete business inputs that the live pipeline predicts as Conditional Pass.
-
-    Uses Visualization_HealthInspections + the same feature construction as /predict
-    to locate (business, neighborhood, date, type) combos where the multiclass
-    model predicts class 1 (Conditional Pass) with proba_conditional >= threshold.
-
-    If a violation_count query parameter is provided, it is passed through to
-    /predict as the current inspection's violation_count, so you can see which
-    combinations would be flagged as Conditional Pass for that level of violations.
-
-    If an inspection_date query parameter is provided (YYYY-MM-DD), it is used
-    as the inspection date seen by the model; otherwise the latest historical
-    inspection date from the dataset is used.
-    """
-
     xgb_model, scaler_mc = _load_multiclass_model_and_scaler()
     df = _load_neighborhood_feature_df()
 
@@ -785,11 +721,7 @@ def safe_float(x):
 
 
 def to_native(val):
-    """Convert NumPy / pandas scalar types to plain Python for JSON.
 
-    FastAPI's jsonable_encoder can struggle with some NumPy scalars,
-    so we normalize anything we know here.
-    """
     # NumPy generic scalars (int64, float64, bool_, etc.)
     if isinstance(val, np.generic):
         val = val.item()
@@ -974,49 +906,333 @@ def _load_neighborhood_feature_df() -> pd.DataFrame:
     _neighborhood_feature_df = df
     return _neighborhood_feature_df
 #--------------------------------------------------
-
 @app.get("/data-insights")
 def data_insights():
-    """Model insight dashboard backed only by a saved metrics .pkl.
-
-    For now we do **not** load any datasets or additional models.
-    We simply expose the weighted ROC-AUC (and a few basic counts)
-    from the metrics dictionary stored in METRICS_PKL_PATH.
-    """
+    import numpy as np
 
     try:
-        metrics = joblib.load(METRICS_PKL_PATH)
+        xgb_metrics = joblib.load(METRICS_PKL_PATH)
     except Exception as exc:
-        return {"error": f"Unable to load metrics file: {exc}"}
+        return {"error": f"Unable to load XGBoost metrics file: {exc}"}
 
-    # Prefer weighted ROC-AUC if available
-    weighted_auc = metrics.get("roc_auc_weighted")
+    # Random Forest metrics are optional; if missing, we still return XGBoost
     try:
-        roc_auc = float(weighted_auc) if weighted_auc is not None else None
+        rf_metrics = joblib.load(RF_METRICS_PKL_PATH)
     except Exception:
-        roc_auc = None
+        rf_metrics = {}
+    
+    # XGBoost: prefer weighted ROC-AUC if available
+    weighted_auc_xgb = xgb_metrics.get("roc_auc_weighted")
+    try:
+        roc_auc_xgb = float(weighted_auc_xgb) if weighted_auc_xgb is not None else None
+    except Exception:
+        roc_auc_xgb = None
 
-    # Basic sizes if present in the metrics
-    total_records = int(metrics.get("val_size") or 0)
-    n_features = int(metrics.get("n_features") or 0)
+    # RF: weighted AUC and class-2 AUC (accept multiple key names)
+    rf_auc_weighted = rf_metrics.get("roc_auc_weighted") or rf_metrics.get("roc_auc")
+    try:
+        rf_auc_weighted = float(rf_auc_weighted) if rf_auc_weighted is not None else None
+    except Exception:
+        rf_auc_weighted = None
+    
+    rf_auc_class2 = None
+    try:
+        # prefer per-class value if available
+        per_class = rf_metrics.get("per_class") or rf_metrics.get("per-class") or {}
+        if isinstance(per_class, dict) and 2 in per_class:
+            rf_auc_class2 = (
+                per_class[2].get("roc_auc")
+                or per_class[2].get("roc_auc_score")
+            )
+        # fallback to explicit key
+        if rf_auc_class2 is None:
+            rf_auc_class2 = (
+                rf_metrics.get("roc_auc_class2")
+                or rf_metrics.get("roc_auc_c2")
+            )
+        rf_auc_class2 = float(rf_auc_class2) if rf_auc_class2 is not None else None
+    except Exception:
+        rf_auc_class2 = None
 
+    # Basic sizes if present in the XGBoost metrics
+    total_records = int(xgb_metrics.get("val_size") or 0)
+    n_features = int(xgb_metrics.get("n_features") or 0)
+    xgb_auc_class2 = None
+    try:
+        per_class_xgb = xgb_metrics.get("roc_auc_per_class") or {}
+    # Depending on how you saved it:
+        val = per_class_xgb.get(2) or per_class_xgb.get("2")
+        xgb_auc_class2 = float(val) if val is not None else None
+    except Exception:
+        xgb_auc_class2 = None
+    # Helper to convert any array-like to list[float]
+    def _to_float_list(obj):
+        try:
+            if obj is None:
+                return None
+            if isinstance(obj, (list, tuple)):
+                return [float(v) for v in obj]
+            if hasattr(obj, "tolist"):
+                try:
+                    return [float(v) for v in obj.tolist()]
+                except Exception:
+                    pass
+            return [float(v) for v in list(obj)]
+        except Exception:
+            return None
+
+    # --- Extract XGBoost class-2 ROC ---
+    xgb_c2_fpr = None
+    xgb_c2_tpr = None
+    try:
+        roc_curves_xgb = xgb_metrics.get("roc_curves") or {}
+        if isinstance(roc_curves_xgb, dict):
+            fpr_dict = roc_curves_xgb.get("fpr", {})
+            tpr_dict = roc_curves_xgb.get("tpr", {})
+
+            def _safe_to_list(val):
+                if isinstance(val, np.ndarray):
+                    return val.tolist()
+                return list(val) if isinstance(val, (list, tuple)) else []
+
+            if isinstance(fpr_dict, dict) and isinstance(tpr_dict, dict):
+                fpr_val = fpr_dict.get(2) or fpr_dict.get("2")
+                tpr_val = tpr_dict.get(2) or tpr_dict.get("2")
+                xgb_c2_fpr = _to_float_list(_safe_to_list(fpr_val)) if fpr_val is not None else None
+                xgb_c2_tpr = _to_float_list(_safe_to_list(tpr_val)) if tpr_val is not None else None
+    except Exception:
+        xgb_c2_fpr = None
+        xgb_c2_tpr = None
+
+    # --- Extract RF class-2 ROC directly from per_class[2] ---
+    rf_c2_fpr = None
+    rf_c2_tpr = None
+    try:
+        per_class_rf = rf_metrics.get("per_class") or rf_metrics.get("per-class") or {}
+        pc2 = per_class_rf.get(2) or per_class_rf.get("2")
+        if isinstance(pc2, dict):
+            pf = pc2.get("fpr")
+            pt = pc2.get("tpr")
+            if pf is not None and pt is not None:
+                rf_c2_fpr = _to_float_list(pf)
+                rf_c2_tpr = _to_float_list(pt)
+    except Exception:
+        rf_c2_fpr = None
+        rf_c2_tpr = None
+
+    # --- Build model_roc_curves (raw per-model class-2 curves) ---
+    xgb_curve_c2 = None
+    if (
+        xgb_c2_fpr is not None
+        and xgb_c2_tpr is not None
+        and len(xgb_c2_fpr) > 0
+        and len(xgb_c2_tpr) > 0
+    ):
+        xgb_curve_c2 = {
+            "fpr": [float(v) for v in xgb_c2_fpr],
+            "tpr": [float(v) for v in xgb_c2_tpr],
+        }
+
+    rf_curve_original = None
+    if (
+        rf_c2_fpr is not None
+        and rf_c2_tpr is not None
+        and len(rf_c2_fpr) > 0
+        and len(rf_c2_tpr) > 0
+    ):
+        rf_curve_original = {
+            "fpr": [float(v) for v in rf_c2_fpr],
+            "tpr": [float(v) for v in rf_c2_tpr],
+        }
+
+    model_roc_curves = {
+        "xgb_class2": xgb_curve_c2,
+        "rf_class2": rf_curve_original,
+    }
+    featureimportance = xgb_metrics.get("featureimportance")
+    top_features = None
+    if isinstance(featureimportance, dict):
+    # sort descending by importance
+        items = sorted(featureimportance.items(), key=lambda kv: kv[1], reverse=True)
+        topn = items[:15]
+        top_features = [
+            {"feature": name, "importance": float(imp)}
+        for name, imp in topn
+    ]
+
+
+    # --- Build aligned roc_curves payload for frontend chart ---
+    roc_curves_payload = None
+    try:
+        if (
+            xgb_c2_fpr is not None
+            and xgb_c2_tpr is not None
+            and len(xgb_c2_fpr) > 0
+            and len(xgb_c2_tpr) > 0
+        ):
+            fpr_c2_py = [float(v) for v in xgb_c2_fpr]
+            tpr_c2_xgb_py = [float(v) for v in xgb_c2_tpr]
+            payload = {"fpr": fpr_c2_py, "tpr_xgb": tpr_c2_xgb_py}
+
+            # If we have RF, align its TPR to the same FPR grid
+            if (
+                rf_c2_fpr is not None
+                and rf_c2_tpr is not None
+                and len(rf_c2_fpr) > 0
+                and len(rf_c2_tpr) > 0
+            ):
+                if len(rf_c2_fpr) == len(fpr_c2_py):
+                    payload["tpr_rf"] = [float(v) for v in rf_c2_tpr]
+                elif len(rf_c2_fpr) >= 2:
+                    try:
+                        xf = np.asarray(fpr_c2_py, dtype=float)
+                        rf_x = np.asarray(rf_c2_fpr, dtype=float)
+                        rf_y = np.asarray(rf_c2_tpr, dtype=float)
+                        sorted_idx = np.argsort(rf_x)
+                        rf_x_sorted = rf_x[sorted_idx]
+                        rf_y_sorted = rf_y[sorted_idx]
+                        ux, inv_idx = np.unique(rf_x_sorted, return_index=True)
+                        if len(ux) >= 2:
+                            rf_x_unique = rf_x_sorted[inv_idx]
+                            rf_y_unique = rf_y_sorted[inv_idx]
+                            interp_y = np.interp(
+                                xf,
+                                rf_x_unique,
+                                rf_y_unique,
+                                left=0.0,
+                                right=1.0,
+                            )
+                            payload["tpr_rf"] = interp_y.astype(float).tolist()
+                        else:
+                            payload["tpr_rf"] = [
+                                float(rf_y_sorted[0]) if len(rf_y_sorted) > 0 else 0.0
+                                for _ in xf
+                            ]
+                    except Exception:
+                        # if interpolation fails, just skip RF in aligned payload
+                        pass
+
+            roc_curves_payload = payload
+
+    except Exception:
+        roc_curves_payload = None
+
+    # Fallback: if aligned payload is still None but we have xgb_class2, at least expose that
+    if roc_curves_payload is None and xgb_curve_c2 is not None:
+        roc_curves_payload = {
+            "fpr": xgb_curve_c2["fpr"],
+            "tpr_xgb": xgb_curve_c2["tpr"],
+            "tpr_rf": None,
+        }
+    cal = xgb_metrics.get("calibration") or xgb_metrics.get("calibration_curve")
+    calibration = None
+    if cal is not None and isinstance(cal, dict):
+        # Expect something like {"bin_center": [...], "observed": [...]}
+        xs = cal.get("bin_center") or cal.get("pred_bin") or []
+        ys = cal.get("observed") or cal.get("empirical") or []
+        if len(xs) and len(xs) == len(ys):
+            calibration = [
+                {"pred_bin": float(x), "observed": float(y)}
+                for x, y in zip(xs, ys)
+        ]
+    # payload["calibrationCurve"] = calibration
+    corr_vals = xgb_metrics.get("correlations")
+    corr_feats = xgb_metrics.get("features")
+    correlations = None
+    if isinstance(corr_vals, (list, tuple)) and isinstance(corr_feats, (list, tuple)):
+        correlations = [
+            {"feature": f, "correlation": float(c)}
+            for f, c in zip(corr_feats, corr_vals)
+        ]
+    # payload["correlations"] = correlations
+
+    featureimportance = xgb_metrics.get("featureimportance")
+    top_features = None
+    if isinstance(featureimportance, dict):
+        # sort descending by importance
+        items = sorted(featureimportance.items(), key=lambda kv: kv[1], reverse=True)
+        topn = items[:10]  # <-- only top 10
+        top_features = [
+            {"feature": name, "importance": float(imp)}
+            for name, imp in topn
+        ]
+    # --- Random Forest metrics extraction ---
+    rf_classification_report = None
+    rf_confusion_matrix = None
+    rf_feature_importance = None
+    rf_metrics_dict = {}
+    try:
+        # Try to extract classification_report, confusion_matrix, feature_importance, and key metrics
+        if isinstance(rf_metrics, dict):
+            rf_classification_report = rf_metrics.get("classification_report")
+            rf_confusion_matrix = rf_metrics.get("confusion_matrix")
+            rf_feature_importance = None
+            rf_feat_imp = rf_metrics.get("featureimportance")
+            if isinstance(rf_feat_imp, dict):
+                items = sorted(rf_feat_imp.items(), key=lambda kv: kv[1], reverse=True)
+                topn = items[:10]
+                rf_feature_importance = [
+                    {"feature": name, "importance": float(imp)} for name, imp in topn
+                ]
+            # Key metrics
+            for k in [
+                "accuracy", "macro_f1", "weighted_f1", "macro_precision", "weighted_precision", "macro_recall", "weighted_recall"
+            ]:
+                v = rf_metrics.get(k)
+                if v is not None:
+                    rf_metrics_dict[k] = float(v)
+    except Exception:
+        pass
+
+    # --- XGBoost metrics extraction ---
+    xgb_classification_report = xgb_metrics.get("classification_report")
+    xgb_confusion_matrix = xgb_metrics.get("confusion_matrix")
+    xgb_feature_importance = None
+    xgb_feat_imp = xgb_metrics.get("featureimportance")
+    if isinstance(xgb_feat_imp, dict):
+        items = sorted(xgb_feat_imp.items(), key=lambda kv: kv[1], reverse=True)
+        topn = items[:10]
+        xgb_feature_importance = [
+            {"feature": name, "importance": float(imp)} for name, imp in topn
+        ]
+    xgb_metrics_dict = {}
+    for k in [
+        "accuracy", "macro_f1", "weighted_f1", "macro_precision", "weighted_precision", "macro_recall", "weighted_recall"
+    ]:
+        v = xgb_metrics.get(k)
+        if v is not None:
+            xgb_metrics_dict[k] = float(v)
+
+    # Return the full insights payload (keep existing keys)
     return {
         "total_records": total_records,
-        # No per-model comparison for now
         "models": [],
-        # ROC curves are not derived from the metrics file at this stage
-        "roc_curves": None,
-        # Leave correlations and fail-rate charts empty for now
+        "roc_curves": roc_curves_payload,
+        "rf_curve": rf_curve_original,
+        "model_roc_curves": model_roc_curves,
         "correlations": {"features": [], "values": []},
         "fail_rate_by_year": [],
-        # Primary metric exposed for the frontend dashboard
-        "roc_auc": roc_auc,
+        "xg_roc_auc_weighted": roc_auc_xgb,
+        "xg_roc_auc_class2": xgb_auc_class2,
+        "rf_roc_auc_class2": rf_auc_class2,
+        "rf_roc_auc_weighted": rf_auc_weighted,
         "recall_fail": None,
         "n_features": n_features,
-        # If a classification report was saved, pass it through
-        "classification_report": metrics.get("classification_report"),
-        "feature_importance": None,
+        "classification_report": xgb_classification_report,
+        "confusion_matrix": xgb_confusion_matrix,
+        "feature_importance": xgb_feature_importance,
+        "featureImportance": top_features,
+        "calibrationCurve": calibration,
+        "topFeatures": top_features,
+        "xgb_metrics": xgb_metrics_dict,
+        # --- Random Forest additions ---
+        "rf_classification_report": rf_classification_report,
+        "rf_confusion_matrix": rf_confusion_matrix,
+        "rf_feature_importance": rf_feature_importance,
+        "rf_metrics": rf_metrics_dict,
     }
+
+
 import pandas as pd
 
 
