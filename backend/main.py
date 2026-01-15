@@ -23,8 +23,10 @@ app.add_middleware(
 
 
 
-# MODEL_PATH = Path(__file__).parent / "model" / "xgboost_tuned_scaleweight.pkl"
-MODEL_PATH = 'C:/Users/lkneh/HealthScore-Predictor/backend/model/xgboost_tuned_scaleweight.pkl'  # adjust as needed
+
+# Use script-relative paths for all data/model files
+BASE_DIR = Path(__file__).parent
+MODEL_PATH = BASE_DIR / "model" / "xgboost_tuned_scaleweight.pkl"
 raw_obj = joblib.load(MODEL_PATH)
 _customer_join_cache = None
 _neighborhood_feature_df = None
@@ -34,14 +36,14 @@ _xgb_multiclass_model = None
 _xgb_multiclass_scaler = None
 _model_dataset_cache = None
 
-NEIGHBORHOOD_SOURCE_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/Visualization_HealthInspections.csv"
-GOOGLE_CLEAN_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/google_cleaned.csv"
-MULTICLASS_DATASET_PATH = "C:/Users/lkneh/HealthScore-Predictor/data/clean/model_dataset.csv"
-RF_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/random_forest_multiclass.pkl"
-XGB_MULTICLASS_MODEL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/xgboost_multiclass_model_20260115_000350.pkl"
-MULTICLASS_SCALER_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/scaler_20260115_000350.pkl"
-METRICS_PKL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/model_metrics_20260115_000350.pkl"
-RF_METRICS_PKL_PATH = "C:/Users/lkneh/HealthScore-Predictor/notebooks/Model/rfmodel_metrics.pkl"
+NEIGHBORHOOD_SOURCE_PATH = BASE_DIR / "data" / "Visualization_HealthInspections.csv"
+GOOGLE_CLEAN_PATH = BASE_DIR / "data" / "google_cleaned.csv"
+MULTICLASS_DATASET_PATH = BASE_DIR / "data" / "clean" / "model_dataset.csv"
+RF_MULTICLASS_MODEL_PATH = BASE_DIR / "model" / "random_forest_multiclass.pkl"
+XGB_MULTICLASS_MODEL_PATH = BASE_DIR / "model" / "xgboost_multiclass_model_20260115_000350.pkl"
+MULTICLASS_SCALER_PATH = BASE_DIR / "model" / "scaler_20260115_000350.pkl"
+METRICS_PKL_PATH = BASE_DIR / "model" / "model_metrics_20260115_000350.pkl"
+RF_METRICS_PKL_PATH = BASE_DIR / "model" / "rfmodel_metrics.pkl"
 TOP_SCORE_THRESHOLD = 3000
 MIN_INSPECTION_DATE = pd.Timestamp("2023-01-01")
 
