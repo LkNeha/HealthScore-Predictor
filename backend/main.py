@@ -16,8 +16,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "https://healthscore-predictor.onrender.com",  # optional, self
-    "https://YOUR-FRONTEND-DOMAIN",               # once deployed
-    "*",                                          # dev: allow all
+    "https://health-score-predictor-ik8n-p8v4hu4xt-nehas-projects-1da3d46f.vercel.app",               # once deployed
+                                         # dev: allow all
 ]
 
 app.add_middleware(
