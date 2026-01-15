@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../index.css";
-import { runPrediction } from "../services/apiClient";
+import { runPrediction, getInspectorInsights } from "../services/apiClient";
 import {
   LineChart,
   Line,
@@ -77,8 +77,7 @@ export default function InspectorDashboard({ onBack }) {
     if (step !== "risk") return;
     const load = async () => {
       try {
-        const res = await fetch("http://localhost:8000/inspector-insights");
-        const data = await res.json();
+        const data = await getInspectorInsights();
         console.log("/inspector-insights payload", data);
         setInsights(data);
       } catch (e) {
