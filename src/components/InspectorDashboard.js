@@ -21,12 +21,32 @@ import {
   ComposedChart,
 } from "recharts";
 import CountUp from "react-countup";
+
+const FACILITY_STATUS_LABELS = {
+  0: "Pass",
+  1: "Conditional Pass",
+  2: "Fail",
+};
+
+function renderInspectorStatus(statusLabel, numericValue) {
+  if (statusLabel) {
+    return statusLabel;
+  }
+  if (numericValue === null || numericValue === undefined) {
+    return "-";
+  }
+  const parsed = Number(numericValue);
+  if (Number.isNaN(parsed)) {
+    return "-";
+  }
+  return FACILITY_STATUS_LABELS[parsed] || "Unknown";
+}
+
 export default function InspectorDashboard({ onBack }) {
   const [step, setStep] = useState("choice"); // choice, auth, risk, predict
   const [selectedAction, setSelectedAction] = useState(null);
   const [code, setCode] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
-
   const handleAuth = () => {
     if (code.length === 6) {
       setStep(selectedAction);
@@ -41,22 +61,18 @@ export default function InspectorDashboard({ onBack }) {
   //   setShowAnswer(false);
   // };
   const [form, setForm] = useState({
-    latitude: "",
-    longitude: "",
+    businessName: "",
+    inspectionDate: "",
     inspectionType: "",
-    avgViolationsLast3: "",
-    daysSinceLastInspection: "",
-    trendLast3: "",
-    lastInspectionDate: "",
-    currentDate: "",
+    analysisNeighborhood: "",
+    violationCount: "",
   });
-  
+
 
   const [insights, setInsights] = useState(null);
   const [insightsError, setInsightsError] = useState(null);
   const riskRef = useRef(null);
   const predictRef = useRef(null);
-
   useEffect(() => {
     if (step !== "risk") return;
     const load = async () => {
@@ -71,7 +87,6 @@ export default function InspectorDashboard({ onBack }) {
     };
     load();
   }, [step]);
-
   // Auto-scroll to the relevant section when step changes
   useEffect(() => {
     if (step === "risk" && riskRef.current) {
@@ -81,13 +96,26 @@ export default function InspectorDashboard({ onBack }) {
     }
   }, [step]);
   const trends = insights?.inspection_trends || [];
-  const dowMonthHeatmap = insights?.dow_month_heatmap || [];
+  const trendsWithTotal = trends.map((row) => ({
+    ...row,
+    total:
+      (row?.pass_count || 0) +
+      (row?.conditional_count || 0) +
+      (row?.fail_count || 0),
+  }));
+
   const delayStats = insights?.inspection_delay_stats || [];
-  const neighbourhoods = insights?.neighbourhood_analysis || [];
+  const neighborhoodFails = (insights?.neighborhood_fail_stats || []).slice(0, 12);
+
   const riskDist = insights?.inspection_year_pie || [];
-  const severityDist = insights?.violation_severity_pie || [];
-  const hasYearPie = Array.isArray(riskDist) && riskDist.length > 0;
-  const hasSeverityPie = Array.isArray(severityDist) && severityDist.length > 0;
+  const failYearPie = trends
+    .map((row) => ({
+      label: row?.year,
+      value: row?.fail_count || 0,
+    }))
+    .filter((row) => row.label != null && row.value > 0);
+  const hasYearPie = failYearPie.length > 0;
+
   const highRisk = insights?.high_risk_records || [];
   const [highRiskLimit, setHighRiskLimit] = useState(10);
   const highRiskToShow = highRisk.slice(0, highRiskLimit);
@@ -104,7 +132,6 @@ export default function InspectorDashboard({ onBack }) {
     "#a855f7", // purple
     "#14b8a6", // teal
   ];
-
   const [prediction, setPrediction] = useState(null);   // {risk_label, risk_score}
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -115,48 +142,32 @@ export default function InspectorDashboard({ onBack }) {
     setLoading(true);
     setError(null);
     setShowAnswer(false);
-
-    // Derive date-based features from the selected dates
-    const currentDateObj = form.currentDate ? new Date(form.currentDate) : null;
-    const lastInspectionDateObj = form.lastInspectionDate
-      ? new Date(form.lastInspectionDate)
+    // Derive date-based features from the selected inspection date
+    const inspectionDateObj = form.inspectionDate
+      ? new Date(form.inspectionDate)
       : null;
-
     const isValidDate = (d) => d instanceof Date && !Number.isNaN(d.getTime());
-
-    let derivedDaysSinceLast = Number(form.daysSinceLastInspection) || 0;
     let inspYear = 0;
     let inspMonth = 0;
     let inspDay = 0;
     let inspDow = 0; // 0 (Sunday) - 6 (Saturday)
-
-    if (isValidDate(currentDateObj)) {
-      inspYear = currentDateObj.getFullYear();
-      inspMonth = currentDateObj.getMonth() + 1; // JS months are 0-based
-      inspDay = currentDateObj.getDate();
-      inspDow = currentDateObj.getDay();
+    if (isValidDate(inspectionDateObj)) {
+      inspYear = inspectionDateObj.getFullYear();
+      inspMonth = inspectionDateObj.getMonth() + 1; // JS months are 0-based
+      inspDay = inspectionDateObj.getDate();
+      inspDow = inspectionDateObj.getDay();
     }
-
-    if (isValidDate(currentDateObj) && isValidDate(lastInspectionDateObj)) {
-      const diffMs = currentDateObj.getTime() - lastInspectionDateObj.getTime();
-      const msPerDay = 1000 * 60 * 60 * 24;
-      derivedDaysSinceLast = Math.max(0, Math.round(diffMs / msPerDay));
-    }
-
     try {
       const data = await runPrediction({
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
-        avg_violations_last_3: Number(form.avgViolationsLast3),
-        fail_rate_last_3: 0,                      // TODO from UI
-        days_since_last_inspection: derivedDaysSinceLast,
-        trend_last_3: Number(form.trendLast3),
-        insp_year: inspYear,
-        insp_month: inspMonth,
-        insp_day: inspDay,
-        insp_dow: inspDow,
-        insp_days_since_ref: 0,
-        inspection_type: form.inspectionType,     // must match backend mapping
+        business_name: form.businessName,
+        inspection_type: form.inspectionType,
+        inspection_date: form.inspectionDate,
+        analysis_neighborhood: form.analysisNeighborhood,
+        // Optional override: current inspection's violation count
+        violation_count:
+          form.violationCount !== "" && !Number.isNaN(Number(form.violationCount))
+            ? Number(form.violationCount)
+            : null,
       });
 
       setPrediction(data);
@@ -168,13 +179,14 @@ export default function InspectorDashboard({ onBack }) {
       setLoading(false);
     }
   };
-
-
-
+  // Derive a display risk label: if the multiclass
+  // prediction is Conditional Pass, show MEDIUM risk in UI
+  const effectiveRiskLabel =
+    prediction && prediction.predicted_class_label === "Conditional Pass"
+      ? "MEDIUM"
+      : prediction?.risk_label || null;
   return (
     <div className="dashboard">
-
-
       {step === "choice" && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -187,7 +199,6 @@ export default function InspectorDashboard({ onBack }) {
             >
               Restaurant at Risk
             </button>
-
             <button
               className="secondary"
               onClick={() => {
@@ -206,8 +217,6 @@ export default function InspectorDashboard({ onBack }) {
           </div>
         </div>
       )}
-
-
       {step === "auth" && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -222,8 +231,6 @@ export default function InspectorDashboard({ onBack }) {
           </div>
         </div>
       )}
-
-
       {step === "risk" && (
         <div ref={riskRef} className="prediction-panel" style={{ marginTop: 0 }}>
           <div className="prediction-header">
@@ -299,13 +306,12 @@ export default function InspectorDashboard({ onBack }) {
               </div>
             </div>
           )}
-
           <div className="dashboard-grid">
             {/* Inspector Trends (Line Chart) */}
             <div className="panel">
               <h3>Inspection Trends</h3>
               <ResponsiveContainer width="100%" height={370}>
-                <LineChart data={trends}>
+                <LineChart data={trendsWithTotal}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis
                     dataKey="year"
@@ -319,26 +325,35 @@ export default function InspectorDashboard({ onBack }) {
                   <Legend />
                   <Line
                     type="monotone"
+                    dataKey="pass_count"
+                    name="Pass"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
                     dataKey="total"
                     name="Total inspections"
-                    stroke="#3b82f6"   /* primary accent */
+                    stroke="#3b82f6"
+                    strokeWidth={2}
                   />
                   <Line
                     type="monotone"
-                    dataKey="fails"
-                    name="Failures"
-                    stroke="#ef4444"   /* fail accent */
+                    dataKey="conditional_count"
+                    name="Conditional Pass"
+                    stroke="#0077b6"
+                    strokeWidth={2}
                   />
                   <Line
                     type="monotone"
-                    dataKey="passes"
-                    name="Non-failures"
-                    stroke="#22c55e"
+                    dataKey="fail_count"
+                    name="Fail"
+                    stroke="#c1121f"
+                    strokeWidth={2}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-
             {/* Inspector Records (Table) */}
             <div
               className="panel"
@@ -402,6 +417,7 @@ export default function InspectorDashboard({ onBack }) {
                         "Fails",
                         "Fail rate",
                         "Avg violations",
+                        "Facility status",
                         "Year",
                       ].map((h) => (
                         <th
@@ -477,6 +493,15 @@ export default function InspectorDashboard({ onBack }) {
                           style={{
                             padding: "8px 12px",
                             borderTop: "1px solid #111827",
+                            borderRight: "1px solid #111827",
+                          }}
+                        >
+                          {renderInspectorStatus(r.status_label, r.facility_rating_status)}
+                        </td>
+                        <td
+                          style={{
+                            padding: "8px 12px",
+                            borderTop: "1px solid #111827",
                           }}
                         >
                           {r.year || "-"}
@@ -487,7 +512,6 @@ export default function InspectorDashboard({ onBack }) {
                 </table>
               </div>
             </div>
-
             {/* Operational / Scheduling View: Heatmap Calendar */}
             {/* <div className="panel">
               <h3>Risky Times: Heatmap</h3>
@@ -595,8 +619,10 @@ export default function InspectorDashboard({ onBack }) {
             </div> */}
 
             {/* Distribution Pies (Year + Violation Severity) */}
+            {/* Distribution Pie: Fail Counts by Year */}
             <div className="panel">
               <h3>Risk Distributions</h3>
+              <h3>Fail Distribution by Year</h3>
               <div>
                 <h4
                   style={{
@@ -606,20 +632,21 @@ export default function InspectorDashboard({ onBack }) {
                   }}
                 >
                   By Year
+                  Inspections rated Fail (status 2)
                 </h4>
                 {hasYearPie ? (
                   <ResponsiveContainer width="100%" height={260}>
                     <PieChart>
-                      <Tooltip formatter={(v, n) => [`${v}`, n]} />
+                      <Tooltip formatter={(v, n) => [`${v}`, "Fails"]} />
                       <Legend />
                       <Pie
-                        data={riskDist}
+                        data={failYearPie}
                         dataKey="value"
                         nameKey="label"
                         outerRadius={110}
                         paddingAngle={3}
                       >
-                        {riskDist.map((entry, index) => (
+                        {failYearPie.map((entry, index) => (
                           <Cell
                             key={`year-cell-${index}`}
                             fill={pieColors[index % pieColors.length]}
@@ -631,6 +658,7 @@ export default function InspectorDashboard({ onBack }) {
                 ) : (
                   <p className="prediction-sub">
                     No year distribution data available.
+                    No fail counts detected for the selected years.
                   </p>
                 )}
               </div>
@@ -638,99 +666,123 @@ export default function InspectorDashboard({ onBack }) {
 
             {/* Operational / Scheduling View: Risk vs Days Since Last Inspection */}
             <div className="panel">
-              <h3>Risk vs Time Since Last Inspection</h3>
+              <h3>Neighborhood Fail Hotspots</h3>
               <p className="prediction-sub" style={{ marginBottom: 8 }}>
-                Bars show inspection volume; line shows fail probability by delay bucket.
+                Count of inspections rated as fail (status 2) by analysis neighborhood.
               </p>
-              {delayStats.length > 0 ? (
-                <ResponsiveContainer width="100%" height={260}>
-                  <ComposedChart data={delayStats} margin={{ left: -10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis
-                      dataKey="bucket"
-                      stroke="#111827"
-                      tick={{ fontSize: 11, fill: "#111827" }}
-                    />
-                    <YAxis
-                      yAxisId="left"
-                      stroke="#111827"
-                      tick={{ fontSize: 11, fill: "#111827" }}
-                      allowDecimals={false}
-                      name="Inspections"
-                    />
-                    <YAxis
-                      yAxisId="right"
-                      orientation="right"
-                      stroke="#4b5563"
-                      tick={{ fontSize: 11, fill: "#4b5563" }}
-                      domain={[0, 1]}
-                      tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                      name="Fail rate"
-                    />
-                    <Tooltip
-                      formatter={(value, name) => {
-                        if (name === "total") return [value, "Inspections"];
-                        if (name === "fail_rate")
-                          return [
-                            `${(value * 100).toFixed(1)}%`,
-                            "Fail rate",
-                          ];
-                        if (name === "fails") return [value, "Fails"];
-                        return [value, name];
-                      }}
-                    />
-                    <Legend />
-                    <Bar
-                      yAxisId="left"
-                      dataKey="total"
-                      name="Inspections"
-                      fill="#3b82f6"
-                      radius={[4, 4, 0, 0]}
-                    />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="fail_rate"
-                      name="Fail rate"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
+              {neighborhoodFails.length > 0 ? (
+                <div className="chart-scroll-wrapper">
+                  <ResponsiveContainer
+                    width={Math.min(1200, neighborhoodFails.length * 120)}
+                    height={280}
+                  >
+                    <BarChart data={neighborhoodFails} margin={{ left: -10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis
+                        dataKey="neighborhood"
+                        stroke="#111827"
+                        interval={0}
+                        angle={-25}
+                        textAnchor="end"
+                        height={90}
+                        tick={{ fontSize: 11, fill: "#111827" }}
+                      />
+                      <YAxis
+                        yAxisId="left"
+                        allowDecimals={false}
+                        stroke="#111827"
+                        tick={{ fontSize: 11, fill: "#111827" }}
+                        name="Inspections"
+                      />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        stroke="#4b5563"
+                        tick={{ fontSize: 11, fill: "#4b5563" }}
+                        domain={[0, 1]}
+                        tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+                        name="Fail rate"
+                      />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          if (name === "fails") return [value, "Fails (rating 2)"];
+                          if (name === "total") return [value, "Total inspections"];
+                          if (name === "fail_rate") {
+                            return [`${(value * 100).toFixed(1)}%`, "Fail rate"];
+                          }
+                          return [value, name];
+                        }}
+                      />
+                      <Legend />
+                      <Bar
+                        yAxisId="left"
+                        dataKey="fails"
+                        name="Fails (rating 2)"
+                        fill="#ef4444"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Line
+                        yAxisId="right"
+                        type="monotone"
+                        dataKey="fail_rate"
+                        name="Fail rate"
+                        stroke="#ef4444"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
                 <p className="prediction-sub">
-                  Delay bucket statistics not available for this dataset.
+                  Neighborhood fail distribution not available for this dataset.
                 </p>
               )}
             </div>
           </div>
         </div>
       )}
-
-
       {step === "predict" && (
         <div ref={predictRef} className="prediction-panel">
           <div className="prediction-header">
             <div>
               <h2>Pass or Closure?</h2>
               <p className="prediction-sub">
-                Quickly estimate restaurant risk based on key factors.
+                Quickly estimate restaurant risk based on business and
+                inspection details.
               </p>
             </div>
             {/* <button className="ghost-btn" onClick={resetFlow}>
       Back
     </button> */}
           </div>
-
           <div className="prediction-grid">
             <div className="field">
-              <label>Latitude</label>
-              <input placeholder="Enter a number" value={form.latitude} onChange={updateField("latitude")} />
+              <label>Business Name</label>
+              <input
+                placeholder="Enter business name"
+                value={form.businessName}
+                onChange={updateField("businessName")}
+              />
             </div>
             <div className="field">
-              <label>Longitude</label>
-              <input placeholder="Enter a number" value={form.longitude} onChange={updateField("longitude")} />
+              <label>Date</label>
+              <input
+                type="date"
+                placeholder="Select inspection date"
+                value={form.inspectionDate}
+                onChange={updateField("inspectionDate")}
+              />
+            </div>
+            <div className="field">
+              <label>Violation count (this inspection)</label>
+              <input
+                type="number"
+                min="0"
+                placeholder="e.g. 0, 1, 2"
+                value={form.violationCount}
+                onChange={updateField("violationCount")}
+              />
             </div>
             <div className="field">
               <label>Inspection Type</label>
@@ -763,31 +815,54 @@ export default function InspectorDashboard({ onBack }) {
               </select>
             </div>
 
-            {/* <div className="field">
-              <label>Voilation Count</label>
-              <input placeholder="Enter a number" /> */}
-            {/* </div> */}
-
             <div className="field">
-              <label>Average Voilation</label>
-              <input placeholder="Last three outcomes" value={form.avgViolationsLast3} onChange={updateField("avgViolationsLast3")} />
-            </div>
-
-            <div className="field">
-              <label>Fail rate</label>
-              <input placeholder="Fail rate for last 3 inspections" value={form.daysSinceLastInspection} onChange={updateField("daysSinceLastInspection")} />
-            </div>
-            <div className="field">
-              <label>Trend</label>
-              <input placeholder="-ve if growth is good else +ve" value={form.trendLast3} onChange={updateField("trendLast3")} />
-            </div>
-            <div className="field">
-              <label>Last Inspection</label>
-              <input type="date" placeholder="number of Days since last inspection" value={form.lastInspectionDate} onChange={updateField("lastInspectionDate")} />
-            </div>
-            <div className="field">
-              <label>Date</label>
-              <input type="date" placeholder="select date" value={form.currentDate} onChange={updateField("currentDate")} />
+              <label>Neighbourhood (analysis)</label>
+              <select
+                value={form.analysisNeighborhood}
+                onChange={updateField("analysisNeighborhood")}
+              >
+                <option value="">Select neighbourhood</option>
+                <option value="analysis_neighborhood_Bernal Heights">Bernal Heights</option>
+                <option value="analysis_neighborhood_Castro/Upper Market">Castro/Upper Market</option>
+                <option value="analysis_neighborhood_Chinatown">Chinatown</option>
+                <option value="analysis_neighborhood_Excelsior">Excelsior</option>
+                <option value="analysis_neighborhood_Financial District/South Beach">Financial District/South Beach</option>
+                <option value="analysis_neighborhood_Glen Park">Glen Park</option>
+                <option value="analysis_neighborhood_Golden Gate Park">Golden Gate Park</option>
+                <option value="analysis_neighborhood_Haight Ashbury">Haight Ashbury</option>
+                <option value="analysis_neighborhood_Hayes Valley">Hayes Valley</option>
+                <option value="analysis_neighborhood_Inner Richmond">Inner Richmond</option>
+                <option value="analysis_neighborhood_Inner Sunset">Inner Sunset</option>
+                <option value="analysis_neighborhood_Japantown">Japantown</option>
+                <option value="analysis_neighborhood_Lakeshore">Lakeshore</option>
+                <option value="analysis_neighborhood_Lincoln Park">Lincoln Park</option>
+                <option value="analysis_neighborhood_Lone Mountain/USF">Lone Mountain/USF</option>
+                <option value="analysis_neighborhood_Marina">Marina</option>
+                <option value="analysis_neighborhood_McLaren Park">McLaren Park</option>
+                <option value="analysis_neighborhood_Mission">Mission</option>
+                <option value="analysis_neighborhood_Mission Bay">Mission Bay</option>
+                <option value="analysis_neighborhood_Nob Hill">Nob Hill</option>
+                <option value="analysis_neighborhood_Noe Valley">Noe Valley</option>
+                <option value="analysis_neighborhood_North Beach">North Beach</option>
+                <option value="analysis_neighborhood_Oceanview/Merced/Ingleside">Oceanview/Merced/Ingleside</option>
+                <option value="analysis_neighborhood_Outer Mission">Outer Mission</option>
+                <option value="analysis_neighborhood_Outer Richmond">Outer Richmond</option>
+                <option value="analysis_neighborhood_Pacific Heights">Pacific Heights</option>
+                <option value="analysis_neighborhood_Portola">Portola</option>
+                <option value="analysis_neighborhood_Potrero Hill">Potrero Hill</option>
+                <option value="analysis_neighborhood_Presidio">Presidio</option>
+                <option value="analysis_neighborhood_Presidio Heights">Presidio Heights</option>
+                <option value="analysis_neighborhood_Russian Hill">Russian Hill</option>
+                <option value="analysis_neighborhood_Seacliff">Seacliff</option>
+                <option value="analysis_neighborhood_South of Market">South of Market</option>
+                <option value="analysis_neighborhood_Sunset/Parkside">Sunset/Parkside</option>
+                <option value="analysis_neighborhood_Tenderloin">Tenderloin</option>
+                <option value="analysis_neighborhood_Treasure Island">Treasure Island</option>
+                <option value="analysis_neighborhood_Twin Peaks">Twin Peaks</option>
+                <option value="analysis_neighborhood_Visitacion Valley">Visitacion Valley</option>
+                <option value="analysis_neighborhood_West of Twin Peaks">West of Twin Peaks</option>
+                <option value="analysis_neighborhood_Western Addition">Western Addition</option>
+              </select>
             </div>
           </div>
 
@@ -798,9 +873,7 @@ export default function InspectorDashboard({ onBack }) {
           >
             {loading ? "Running..." : "Run prediction"}
           </button>
-
           {error && <p className="error-text">{error}</p>}
-
           {showAnswer && prediction && (
             <div className="answer">
               <h3>Prediction Result</h3>
@@ -808,27 +881,48 @@ export default function InspectorDashboard({ onBack }) {
                 Restaurant Risk:{" "}
                 <span
                   className={
-                    prediction.risk_label === "HIGH"
+                    effectiveRiskLabel === "HIGH"
                       ? "risk-high"
-                      : prediction.risk_label === "MEDIUM"
+                      : effectiveRiskLabel === "MEDIUM"
                         ? "risk-medium"
                         : "risk-low"
                   }
                 >
-                  {prediction.risk_label}
+                  {effectiveRiskLabel}
                 </span>
               </p>
-              {/* <p>Score: {(prediction.risk_score * 100).toFixed(1)}%</p> */}
-              <p>
+              {/* <p>
                 Predicted outcome: {prediction.outcome_text} (flag {prediction.outcome_label})
-              </p>
-              <p>
-                {/* Risk band: {prediction.risk_label} – {(prediction.risk_score * 100).toFixed(1)}% */}
-              </p>
+              </p> */}
+              {(prediction.predicted_class_label ||
+                prediction.proba_pass != null ||
+                prediction.proba_conditional != null ||
+                prediction.proba_fail != null) && (
+                <div style={{ marginTop: 12 }}>
+                  {prediction.predicted_class_label && (
+                    <p>
+                      Multiclass prediction: {prediction.predicted_class_label}
+                    </p>
+                  )}
+                  <p style={{ marginBottom: 4 }}>Class probabilities:</p>
+                  <ul style={{ marginTop: 0, paddingLeft: 18 }}>
+                    {prediction.proba_pass != null && (
+                      <li>Pass: {(prediction.proba_pass * 100).toFixed(1)}%</li>
+                    )}
+                    {prediction.proba_conditional != null && (
+                      <li>
+                        Conditional Pass: {(prediction.proba_conditional * 100).toFixed(1)}%
+                      </li>
+                    )}
+                    {prediction.proba_fail != null && (
+                      <li>Fail: {(prediction.proba_fail * 100).toFixed(1)}%</li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
-
       )}
     </div>
   );

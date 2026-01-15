@@ -2,21 +2,20 @@ import React, { useState } from "react";
 import DashboardCards from "../components/DashboardCards";
 import InspectorDashboard from "../components/InspectorDashboard";
 import CustomerDashboard from "../components/CustomerDashboard";
+import CustomerPortal from "../components/CustomerPortal";
 import ExploreDashboard from "../components/ExploreDashboard";
 import DataDashboard from "../components/DataDashboard";
 import "../pages/AnalyticsDashboard.css";
 import CountUp from "react-countup";
-
 import img1 from "../images/final.jpg";
-
 // const heroImages=[img1, img2, img3, img4, img5];
-
 export default function AnalyticsDashboard() {
     const [activeDashboard, setActiveDashboard] = useState(null);
     const [dashboardClicks, setDashboardClicks] = useState({
         inspector: 0,
         customer: 0,
         explore: 0,
+        data: 0,
     });
     const handleSelect = (type) => {
         setActiveDashboard(type);
@@ -27,7 +26,6 @@ export default function AnalyticsDashboard() {
     };
     return (
         <div className="page">
-
             <section className="hero-slider-loop">
                 <div
                     className="hero-bg"
@@ -41,37 +39,32 @@ export default function AnalyticsDashboard() {
             <section className="dashboard-area">
                 <div className="container">
                     <h2 className="titleAnalytics">ANALYTICS DASHBOARD</h2>
-
                     <div className="dash-row">
                         {/* left: cards (unchanged markup inside) */}
                         <div className="dash-left">
                             <DashboardCards onSelect={handleSelect} />
                         </div>
-
                         {/* right: text */}
                         <div className="dash-right dash-right-metrics">
                             <h3 className="dash-kicker">TODAY’S HIGHLIGHTS</h3>
-
                             <div className="metric-block">
                                 <div className="metric-value"><CountUp end={32097} duration={2} /></div>
                                 <div className="metric-label">inspections completed</div>
                             </div>
 
                             <div className="metric-block">
-                                <div className="metric-value"><CountUp end={7.1} duration={2} suffix="%" /></div>
+                                <div className="metric-value"><CountUp end={2.6} duration={2} suffix="%" /></div>
                                 <div className="metric-label">facilities compliant</div>
                             </div>
 
                             <div className="metric-block">
                                 <div className="metric-value">
-                                    <CountUp end={1453} duration={2} />
+                                    <CountUp end={589} duration={2} />
                                 </div>
                                 <div className="metric-label">high‑risk alerts flagged</div>
                             </div>
                         </div>
-
                     </div>
-
                     <div className="dashboard-detail">
                         {activeDashboard === "inspector" && (
                             <InspectorDashboard
@@ -81,16 +74,13 @@ export default function AnalyticsDashboard() {
                         )}
 
                         {activeDashboard === "customer" && (
-                            <CustomerDashboard
-                                key={dashboardClicks.customer}
-                            />
+                            <CustomerPortal key={dashboardClicks.customer} />
                         )}
                         {activeDashboard === "data" && (
                             <DataDashboard
                                 key={dashboardClicks.data}
                             />
                         )}
-
                         {activeDashboard === "explore" && (
                             <ExploreDashboard
                                 key={dashboardClicks.explore}
@@ -99,9 +89,6 @@ export default function AnalyticsDashboard() {
                     </div>
                 </div>
             </section>
-
-
-
         </div>
     );
 }

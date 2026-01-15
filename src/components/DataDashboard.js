@@ -19,6 +19,7 @@ export default function DataDashboard() {
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedModelId, setSelectedModelId] = useState(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -52,25 +53,39 @@ export default function DataDashboard() {
   if (!insights) return null;
 
   const {
-    roc_auc,
-    recall_fail,
     total_records,
-    n_features,
-    roc_curve,
-    feature_importance,
+    models = [],
+    roc_curves,
     correlations,
     fail_rate_by_year,
-    classification_report,
+    roc_auc: overallRocAuc,
+    n_features: overallNFeatures,
   } = insights;
 
-  // Build data for ROC chart
+  const effectiveSelectedModelId =
+    selectedModelId || (models[0] ? models[0].id : null);
+
+  const selectedModel =
+    models.find((m) => m.id === effectiveSelectedModelId) || models[0] || {};
+
+  const {
+    name: selectedName,
+    roc_auc: modelRocAuc,
+    recall_fail,
+    n_features,
+    feature_importance,
+    classification_report,
+  } = selectedModel;
+
+  // Build data for ROC chart with both models overlaid
   const rocData =
-    roc_curve?.fpr?.map((fprVal, idx) => ({
+    roc_curves?.fpr?.map((fprVal, idx) => ({
       fpr: fprVal,
-      tpr: roc_curve.tpr[idx],
+      tpr_rf: roc_curves.tpr_rf?.[idx],
+      tpr_xgb: roc_curves.tpr_xgb?.[idx],
     })) || [];
 
-  // Top 10 feature importance for bar chart
+  // Top 10 feature importance for bar chart (current model)
   const topFeatures = (feature_importance || []).slice(0, 10);
 
   // correlation heat data: flatten matrix into cells
@@ -105,48 +120,40 @@ export default function DataDashboard() {
           <h2 className="title">MODEL INSIGHTS</h2>
           {/* Summary strip */}
           <div className="summary-row">
-          <div className="summary-card">
-            <div className="summary-label">Total Records</div>
-            <div className="summary-value">
-              <CountUp
-                end={total_records || 0}
-                duration={2}
-                separator="," 
-              />
+            <div className="summary-card">
+              <div className="summary-label">Total Records</div>
+              <div className="summary-value">
+                <CountUp
+                  end={total_records || 0}
+                  duration={2}
+                  separator="," 
+                />
+              </div>
+              <div className="summary-sub">Training / validation set</div>
             </div>
-            <div className="summary-sub">Training / validation set</div>
-          </div>
 
-          <div className="summary-card">
-            <div className="summary-label">Features</div>
-            <div className="summary-value">
-              <CountUp
-                end={n_features || 0}
-                duration={2}
-              />
+            <div className="summary-card">
+              <div className="summary-label">Features</div>
+              <div className="summary-value">
+                <CountUp
+                  end={overallNFeatures || n_features || 0}
+                  duration={2}
+                />
+              </div>
+              <div className="summary-sub">Engineered predictors</div>
             </div>
-            <div className="summary-sub">Engineered predictors</div>
-          </div>
 
-          <div className="summary-card">
-            <div className="summary-label">ROC‑AUC</div>
-            <div className="summary-value">
-              <CountUp
-                end={roc_auc || 0}
-                duration={2}
-                decimals={3}
-              />
+            <div className="summary-card">
+              <div className="summary-label">ROC‑AUC (Weighted)</div>
+              <div className="summary-value">
+                <CountUp
+                  end={overallRocAuc || modelRocAuc || 0}
+                  duration={2}
+                  decimals={3}
+                />
+              </div>
+              <div className="summary-sub">From saved metrics</div>
             </div>
-            <div className="summary-sub">
-              Recall (fail): {" "}
-              <CountUp
-                end={(recall_fail || 0) * 100}
-                duration={2}
-                decimals={1}
-                suffix="%"
-              />
-            </div>
-          </div>
           </div>
 
         {/* Block 1: AUC */}
@@ -177,9 +184,16 @@ export default function DataDashboard() {
                 <Legend verticalAlign="top" height={24} />
                 <Line
                   type="monotone"
-                  dataKey="tpr"
-                  name="TPR"
+                  dataKey="tpr_rf"
+                  name="Random Forest"
                   stroke="#38bdf8"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="tpr_xgb"
+                  name="XGBoost"
+                  stroke="#ef4444"
                   dot={false}
                 />
               </LineChart>
@@ -232,6 +246,23 @@ export default function DataDashboard() {
           {/* Feature importance */}
           <div className="data-card">
             <h3>Top Feature Importances</h3>
+            {models.length > 1 && (
+              <div className="model-toggle">
+                {models.map((m) => (
+                  <button
+                    key={m.id}
+                    className={
+                      m.id === selectedModelId
+                        ? "model-toggle-btn active"
+                        : "model-toggle-btn"
+                    }
+                    onClick={() => setSelectedModelId(m.id)}
+                  >
+                    {m.name}
+                  </button>
+                ))}
+              </div>
+            )}
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={topFeatures} layout="vertical" margin={{ left: 80, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.15)" />
