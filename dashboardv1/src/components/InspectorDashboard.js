@@ -15,10 +15,7 @@ import {
   PieChart,
   Pie,
   Cell,
-  ScatterChart,
-  Scatter,
-  ZAxis,
-  ComposedChart,
+
 } from "recharts";
 import CountUp from "react-countup";
 
@@ -103,10 +100,10 @@ export default function InspectorDashboard({ onBack }) {
       (row?.fail_count || 0),
   }));
 
-  const delayStats = insights?.inspection_delay_stats || [];
+
   const neighborhoodFails = (insights?.neighborhood_fail_stats || []).slice(0, 12);
 
-  const riskDist = insights?.inspection_year_pie || [];
+  
   const failYearPie = trends
     .map((row) => ({
       label: row?.year,

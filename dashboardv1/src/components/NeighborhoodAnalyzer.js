@@ -5,26 +5,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchCustomerNeighborhoods } from "../services/apiClient";
 
-const SUMMARY_FIELDS = [
-  { key: "total_inspections", label: "Total inspections", decimals: 0 },
-  { key: "avg_violation_count", label: "Avg violations", decimals: 1 },
-  {
-    key: "avg_days_since_last_inspection",
-    label: "Avg days since last",
-    decimals: 0,
-  },
-  { key: "first_inspection_rate", label: "First inspection rate", decimals: 1, percent: true },
-  {
-    key: "avg_violation_count_last_3",
-    label: "Avg violations (last 3)",
-    decimals: 1,
-  },
-  {
-    key: "avg_prev_rating_majority_3",
-    label: "Prev rating majority",
-    decimals: 1,
-  },
-];
 
 const DEFAULT_CENTER = [37.773972, -122.431297];
 

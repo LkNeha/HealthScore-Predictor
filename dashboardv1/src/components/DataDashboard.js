@@ -10,8 +10,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
   Legend,
 } from "recharts";
 import { getDataInsights } from "../services/apiClient";
@@ -65,9 +63,7 @@ export default function DataDashboard() {
     );
   if (!insights) return null;
 
-  // NEW: global feature-importance + calibration (from /data-insights)
-  const featureImportance = insights?.featureImportance ?? [];
-  const calibration = insights?.calibrationCurve ?? [];
+ 
 
   // correlations is still the matrix structure coming from backend
   const correlations = insights?.correlations ?? { features: [], values: [] };
@@ -139,10 +135,6 @@ export default function DataDashboard() {
   // Extract both XGBoost and RF metrics for comparison
   const xgbClassificationReport = insights.classification_report;
   const rfClassificationReport = insights.rf_classification_report;
-  const xgbConfusionMatrix = insights.confusion_matrix;
-  const rfConfusionMatrix = insights.rf_confusion_matrix;
-  const xgbFeatureImportance = insights.feature_importance || [];
-  const rfFeatureImportance = insights.rf_feature_importance || [];
   const xgbMetrics = insights.xgb_metrics || {};
   const rfMetrics = insights.rf_metrics || {};
 
@@ -158,47 +150,7 @@ export default function DataDashboard() {
         f1: report[cls]["f1-score"],
       }));
   };
-  const xgbBarData = getBarChartData(xgbClassificationReport);
-  const rfBarData = getBarChartData(rfClassificationReport);
-
-  // Prepare data for metrics table
-  const metricsTableRows = [
-    {
-      metric: "Accuracy",
-      xgb: xgbMetrics.accuracy,
-      rf: rfMetrics.accuracy,
-    },
-    {
-      metric: "Macro F1",
-      xgb: xgbMetrics.macro_f1,
-      rf: rfMetrics.macro_f1,
-    },
-    {
-      metric: "Weighted F1",
-      xgb: xgbMetrics.weighted_f1,
-      rf: rfMetrics.weighted_f1,
-    },
-    {
-      metric: "Macro Precision",
-      xgb: xgbMetrics.macro_precision,
-      rf: rfMetrics.macro_precision,
-    },
-    {
-      metric: "Weighted Precision",
-      xgb: xgbMetrics.weighted_precision,
-      rf: rfMetrics.weighted_precision,
-    },
-    {
-      metric: "Macro Recall",
-      xgb: xgbMetrics.macro_recall,
-      rf: rfMetrics.macro_recall,
-    },
-    {
-      metric: "Weighted Recall",
-      xgb: xgbMetrics.weighted_recall,
-      rf: rfMetrics.weighted_recall,
-    },
-  ];
+  
 
   return (
     <section className="data-section" ref={containerRef}>

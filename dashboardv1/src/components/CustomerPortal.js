@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import CustomerDashboard from "./CustomerDashboard";
 import NeighborhoodAnalyzer from "./NeighborhoodAnalyzer";
 
-const MODES = {
-  restaurant: {
-    label: "Restaurant Lookup",
-    helper: "Search for a single business and see its inspection history.",
-  },
-  neighborhood: {
-    label: "Analyze Neighborhood",
-    helper: "Explore aggregated inspection trends across San Francisco neighborhoods.",
-  },
-};
+// const MODES = {
+//   restaurant: {
+//     label: "Restaurant Lookup",
+//     helper: "Search for a single business and see its inspection history.",
+//   },
+//   neighborhood: {
+//     label: "Analyze Neighborhood",
+//     helper: "Explore aggregated inspection trends across San Francisco neighborhoods.",
+//   },
+// };
 
 export default function CustomerPortal() {
   const [mode, setMode] = useState(null);
