@@ -1,0 +1,5 @@
+businessname,address,inspection_date,inspection_type,facility_rating_status,violation_count,violation_codes,latitude,longitude,failflag,avg_violations_last_3,fail_rate_last_3,prev_inspection_date,days_since_last_inspection,trend_last_3,canonical_address
+1 hotel san francisco terrene,8 mission street,3/10/2020,reinspection/followup,Pass,0,nan,,,0,0,0.0,nan,-1,0,8 mission street
+1 hotel san francisco terrene,8 mission street,6/7/2022,routine,Conditional Pass,0,"Compliance with variance, specialized processes & HACCP  [ date violation corrected: 6/14/2022 ]",,,1,0,0.0,3/10/2020,819,0,8 mission street
+1 hotel san francisco terrene,8 mission street,6/14/2022,reinspection/followup,Pass,0,nan,,,0,0,0.5,6/7/2022,7,0,8 mission street
+1 hotel san francisco terrene,8 mission street,1/12/2023,routine,Pass,0,Adequate hand washing facilities; supplied and accessible,,,0,0,0.3333333333333333,6/14/2022,212,0,8 mission street
