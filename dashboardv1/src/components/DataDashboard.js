@@ -14,6 +14,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
+import { getDataInsights } from "../services/apiClient";
 
 export default function DataDashboard() {
   const [loading, setLoading] = useState(true);
@@ -25,8 +26,7 @@ export default function DataDashboard() {
   useEffect(() => {
     const loadInsights = async () => {
       try {
-        const res = await fetch("http://localhost:8000/data-insights");
-        const data = await res.json();
+        const data = await getDataInsights();
         if (data.error) {
           setError(data.error);
         } else {

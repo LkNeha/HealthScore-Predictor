@@ -1,6 +1,15 @@
+// Get model/data insights from backend
+
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+export async function getDataInsights() {
+  const res = await fetch(`${BASE_URL}/data-insights`);
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.status}`);
+  }
+  return res.json();
+}
 // import axios from "axios";
 
-const BASE_URL = "http://localhost:8000";
 
 export async function runPrediction(payload) {
   // Uses the main multiclass /predict endpoint
