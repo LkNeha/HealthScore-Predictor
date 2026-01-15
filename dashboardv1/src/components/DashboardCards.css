@@ -1,0 +1,53 @@
+.card-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* square cards */
+.card {
+  position: relative;
+  width: 220px;          /* control size */
+  aspect-ratio: 1 / 1;   /* makes it square; if not supported, see fallback below */
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* dark overlay + text */
+.card-inner {
+  position: absolute;
+  inset: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 50%);
+  color: #0000;
+}
+
+.card-inner h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.2rem;
+  color: black;
+}
+
+.card-inner p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-emphasis-color: black;
+  color: black;
+}

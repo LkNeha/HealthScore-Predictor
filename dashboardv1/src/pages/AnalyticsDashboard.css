@@ -1,0 +1,184 @@
+.page {
+  min-height: 100vh;
+}
+
+/* top half */
+.hero {
+  background-color: #f2f2ef;        /* light color */
+  height: 50vh;                     /* half of viewport */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-content {
+  text-align: center;
+}
+
+/* bottom half */
+.dashboard-area {
+  background-color: #101018;        /* darker color or image */
+  min-height: 50vh;                 /* rest of page */
+  padding: 0px 0;
+}
+
+.dashboard-area .title {
+  color: #fff;
+}
+.hero-marquee {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.hero-track {
+  display: flex;
+  gap: 16px;
+  animation: scroll-left 20s linear infinite;
+}
+
+.hero-img {
+  height: 140px;          /* adjust as needed */
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* move strip from right to left in a loop */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* half, because we duplicated array */
+  }
+}
+.hero {
+  height: 50vh;                  /* or 60vh / 100vh */
+  background-size: cover;        /* fill entire section */
+  background-position: top;   /* center crop */
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.hero-slider-loop {
+  position: relative;
+  height: 45vh;
+  overflow: hidden;
+}
+
+.hero-bg {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* overlay text block on left */
+.hero-text {
+  position: absolute;
+  left: 5vw;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  max-width: 32rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", sans-serif;
+}
+.title{
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",;
+}
+
+.hero-text h1 {
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #00202e;
+}
+
+.hero-text p {
+  margin-top: 0.75rem;
+  font-size: 1.5rem;
+  opacity: 0.9;
+  color: #00202e;
+}
+
+.dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40; /* above everything */
+}
+
+.dashboard-overlay-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 1200px;
+  background: #050712;
+  border-radius: 16px;
+  padding: 24px;
+  overflow: auto;
+}
+.dashboard-detail {
+  margin-top: 32px; /* space between cards and charts */
+}
+/* row containing cards + right text */
+.dash-row {
+  display: flex;
+  align-items: flex-start;
+  /* justify-content: space-between; */
+  gap: 40px;
+}
+
+/* LEFT column: keep natural width; don't shrink */
+.dash-left {
+  flex: 0 0 auto;      /* cards keep their 220px width */
+}
+.dash-right {
+  flex: 1 1 auto;
+  color: #e5e7eb;
+  text-align: right;
+  padding-right: 40px;
+}
+.dash-right-metrics {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;  /* vertically center in the section */
+  padding-right: 80px;
+  color: #e5e7eb;
+  min-height: 220px;        /* similar height to cards row */
+}
+
+.dash-kicker {
+  margin: 0;
+  font-size: 3rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.metric-block {
+  margin-bottom: 18px;
+}
+
+.metric-value {
+  font-size: 3rem;          /* bigger numbers */
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.metric-label {
+  font-size: 0.95rem;
+  color: #9ca3af;
+}
